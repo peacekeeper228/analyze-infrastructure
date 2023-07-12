@@ -1,0 +1,21 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Интерактивная карта</title>
+  {% block head %}{% endblock %}
+</head>
+
+<body>
+  <div class="main_container">
+    <ul class="menu-main">
+      <li><a href="{{ url_for('basic_page') }}">Главная страница</a></li>
+      <li><a href="{{ url_for('about') }}">О проекте</a></li>
+    </ul>
+  </div>
+  <hr>
+  {% block content %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

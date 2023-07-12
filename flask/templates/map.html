@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Document</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="" />
+<link href="{{ url_for('static', filename='check_box.css') }}" rel="stylesheet" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+<script src="https://unpkg.com/h3-js"></script>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  .legend {
+    padding: 6px 8px;
+    font: 14px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
+    /*border-radius: 5px;*/
+    line-height: 24px;
+    color: #555;
+  }
+
+  .legend h4 {
+    text-align: center;
+    font-size: 16px;
+    margin: 2px 12px 8px;
+    color: #777;
+  }
+
+  .legend span {
+    position: relative;
+    bottom: 3px;
+  }
+
+  .legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin: 0 8px 0 0;
+    opacity: 0.7;
+  }
+
+  .legend i.icon {
+    background-size: 18px;
+    background-color: rgba(255, 255, 255, 1);
+  }
+
+  .parent {
+    display: flex;
+    height: 75%;
+  }
+
+  .child {
+    display: block;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+
+  .child.max {
+    flex: 1;
+  }
+/*Анимация загрузки*/
+  .wrapper {
+    width: 200px;
+    height: 60px;
+    position: absolute;
+    left: 20%;
+    top: 35%;
+    transform: translate(-50%, -50%);
+  }
+
+  .circle {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    border-radius: 50%;
+    background-color: #ff0000;
+    left: 15%;
+    transform-origin: 50%;
+    animation: circle .5s alternate infinite ease;
+  }
+
+  @keyframes circle {
+    0% {
+      top: 60px;
+      height: 5px;
+      border-radius: 50px 50px 25px 25px;
+      transform: scaleX(1.7);
+    }
+
+    40% {
+      height: 20px;
+      border-radius: 50%;
+      transform: scaleX(1);
+    }
+
+    100% {
+      top: 0%;
+    }
+  }
+
+  .circle:nth-child(2) {
+    left: 45%;
+    animation-delay: .2s;
+  }
+
+  .circle:nth-child(3) {
+    left: auto;
+    right: 15%;
+    animation-delay: .3s;
+  }
+
+  .shadow {
+    width: 20px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, .5);
+    position: absolute;
+    top: 62px;
+    transform-origin: 50%;
+    z-index: -1;
+    left: 15%;
+    filter: blur(1px);
+    animation: shadow .5s alternate infinite ease;
+  }
+
+  @keyframes shadow {
+    0% {
+      transform: scaleX(1.5);
+    }
+
+    40% {
+      transform: scaleX(1);
+      opacity: .7;
+    }
+
+    100% {
+      transform: scaleX(.2);
+      opacity: .4;
+    }
+  }
+
+  .shadow:nth-child(4) {
+    left: 45%;
+    animation-delay: .2s
+  }
+
+  .shadow:nth-child(5) {
+    left: auto;
+    right: 15%;
+    animation-delay: .3s;
+  }
+
+  .wrapper span {
+    position: absolute;
+    top: 75px;
+    font-family: 'Lato';
+    font-size: 20px;
+    font-weight:bold;
+    letter-spacing: 12px;
+    color: #1500ff;
+    left: 15%;
+  }
+
+  input.button-add {
+    background-image: url("../static/images/buttons/remove_icon.png");
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    border: none;
+    cursor: pointer;
+    height: 32px;
+    padding-left: 32px;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+  }
+
+  div.insideeditlist {
+    display: table-cell;
+    overflow-wrap: normal;
+  }
+  .button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 20px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+  margin-left: 9px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<style>
+  div {
+    display: inline-block
+  }
+</style>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap");
+.main1,
+.main1::before,
+.main1::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.main1 {
+  width: 200px;
+  height: 60px;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: "Josefin Sans", sans-serif;
+  background-color: rgba(224,180,14,1);
+  cursor: pointer;
+  box-shadow: 5px 5px 0 0;
+  transition: 0.3s;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 20px;
+  margin-left: 20px;
+  margin-top: 10px;
+}
+.apply {
+  position: absolute;
+  text-decoration: none;
+  color: #000;
+  z-index: 1000;
+}
+.main1::after {
+  content: "";
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 60px;
+  background: linear-gradient(to right, #ff7675, #e84393);
+  opacity: 0;
+  transition: 0.3s;
+}
+.main1:hover {
+  box-shadow: -5px -5px 0 0;
+  transform: scale(0.9);
+}
+.main1:hover::after {
+  opacity: 1;
+}
+</style>
+</style>
+<div id="loadingImg" class="wrapper" style="display: none;">
+  <div class="circle"></div>
+  <div class="circle"></div>
+  <div class="circle"></div>
+  <div class="shadow"></div>
+  <div class="shadow"></div>
+  <div class="shadow"></div>
+  <span>Загрузка...</span>
+</div>
+<fieldset class="parent">
+  <div class="child">
+    <legend>Выберите районы и тип зданий для анализа</legend>
+    <ul id="listofdistricts">
+      {% for countyValue, districtarray in datadistricts.items() %}
+      <li>
+        <input type="checkbox" class="outer" id="{{countyValue}}1">
+        <label class="custom-unchecked">{{countyValue}} (можно развернуть)</label>
+        <ul id="{{countyValue}}" hidden="hidden">
+          {% for district in districtarray %}
+          <li class="inner">
+            <input type="checkbox" class="inner" id="{{district}}">
+            <label for="{{district}}" class="custom-unchecked">{{district}}</label>
+          </li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+    <form>
+      <fieldset>
+        <legend>Выберите тип зданий</legend>
+        <div>
+          <input type="radio" id="contactChoice1" name="buldtype" value="0" />
+          <label for="contactChoice1">Школы</label>
+          <input type="radio" id="contactChoice2" name="buldtype" value="3" />
+          <label for="contactChoice2">Детские сады</label>
+          <input type="radio" id="contactChoice3" name="buldtype" value="1" />
+          <label for="contactChoice3">Мед учреждения</label>
+          <input type="radio" id="contactChoice4" name="buldtype" value="2" />
+          <label for="contactChoice4">Жилые здания</label>
+        </div>
+      </fieldset>
+    </form>
+    <fieldset>
+      <legend>Выберите размер гексагона (длина ребра)</legend>
+      <div>
+        <input type="radio" id="contactChoice1" name="hexsize" value="9" />
+        <label for="contactChoice1">201 м</label>
+        <input type="radio" id="contactChoice1" name="hexsize" value="8" />
+        <label for="contactChoice1">530 м</label>
+        <input type="radio" id="contactChoice2" name="hexsize" value="7" />
+        <label for="contactChoice2">1400 м</label>
+      </div>
+    </fieldset>
+    <div>
+      <button onclick="getanalysis();" name="button" class="button" id="newButton" style="width: 150px;"><span>Анализ по районам</span></button>
+      <button onclick="gethexagones();" name="button" class="button" id="newButton1" style="width: 150px;"><span>Гексагональный анализ</span></button>
+      <button onclick="getbuildings();" name="button" class="button" id="newButton2" style="width: 150px;"><span>Вывести объекты</span></button>
+    </div>
+    <br>
+    <div>
+      <button onclick="getstatisticsdistricts();" name="button" class="button" id="newButton3" style="width: 235px;"><span>Статистика по районам</span></button>
+      <button onclick="getstatisticscounties();" name="button" class="button" id="newButton4" style="width: 235px;"><span>Статистика по округам</span></button>
+    </div>
+  </div>
+  <div class="child max">
+    <div id="map"></div>
+  </div>
+</fieldset>
+<div onclick="applychanges();" class="main1"><a class="apply" href="#">Применить изменения</a></div>
+<div onclick="clearAll();" class="main1"><a class="apply" href="#">Очистить все</a></div>
+<font color="white">
+<p>Измененные элементы будут отображаться здесь, но не будут видны на карте пока их не применить</p>
+<ul id="listOfChanges"></ul>
+</font>
+<div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+<script src="{{url_for('static', filename='checkbox.js')}}"></script>
+<script src="{{url_for('static', filename='map.js')}}"></script>
+<script src="{{url_for('static', filename= 'requests.js')}}"></script>
+<script src="{{url_for('static', filename= 'markedData.js')}}"></script>
+<script>
+  let map_init = L.map('map', {
+    center: [55.703598577482609, 37.938057458250945],
+    zoom: 8,
+  });
+  let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map_init);
+  //var marker = L.marker([55.703598577482609, 37.938057458250945]).addTo(map_init);
+  //var marker1 = L.marker([9.0822, 8.6755]).addTo(map_init);
+  //var polygonPoints = [[ 37.938764987543998, 55.703689508653 ], [ 37.938224572194997, 55.703214829175003 ], [ 37.938093441904002, 55.703131983780999 ], [ 37.937938470009001, 55.703217068371998 ], [ 37.937243082111003, 55.703669357319001 ], [ 37.936543720830002, 55.703268566913998 ], [ 37.936309275985003, 55.703384998033997 ], [ 37.936305302439997, 55.703456647807997 ], [ 37.937131819973999, 55.703946997422001 ], [ 37.937350370569, 55.703949236485002 ], [ 37.937406001522, 55.703989538899997 ], [ 37.938558358012003, 55.704009690115001 ], [ 37.938649751861, 55.703964909642998 ], [ 37.938840486651998, 55.703964909642998 ], [ 37.939726609013, 55.703492472691998 ], [ 37.939710714501999, 55.703432018261999 ], [ 37.939472295850003, 55.703302152816001 ], [ 37.938764987543998, 55.703689508653 ] ];
+  //var poly = L.polygon(polygonPoints).addTo(map_init);
+
+  let Basemaps = {
+    "OSM": osm
+  }
+
+  let controlsLayer = L.control.layers(Basemaps);
+  let legendsOnMap = [];
+  controlsLayer.addTo(map_init);
+  let overLayers = [];
+  let changesArray = []
+</script>
+{% endblock %}

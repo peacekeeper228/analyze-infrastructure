@@ -1,0 +1,123 @@
+.multiselect {
+    width: 250px;
+  }
+  
+  .big_box {
+    width: 60%;
+    background-color: rgba(224,180,14,1);
+      position: absolute;
+      left: 20%;
+  color: #FFFFFF;
+  text-align: left;
+  font-size: 20px;
+  }
+  
+  .selectBox {
+    position: relative;
+  }
+  
+  .selectBox select {
+    width: 100%;
+    font-weight: bold;
+  }
+  
+  .overSelect {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+  
+  #checkboxes {
+    display: none;
+    border: 1px #dadada solid;
+    background-color: #FFFFFF;
+  color: #000000;
+  }
+  
+  #checkboxes label {
+    display: block;
+  }
+  
+  #checkboxes label:hover {
+    background-color: #1e90ff;
+  }
+  
+  .menu-main {
+    display: table;
+    width: 100%;
+    background: rgba(224,180,14,1);
+    margin: 0;
+  }
+  
+  .menu-main ul{
+    display: table-row;
+    margin: 0;
+  }
+  .menu-main li {
+      text-align: center;
+      width: 25%;
+      display: table-cell;
+      padding: 0;
+      margin: 0;
+  }
+  
+  .menu-main a {
+    line-height: normal;
+    display: inline-block;
+      
+    text-decoration: none;
+    font-family: 'Comfortaa', sans-serif;
+    position: relative;
+    color: rgba(230,232,239,1);
+    font-weight: Bold;
+    font-size: 3.5vw;
+    text-align: center;
+  }
+  
+  .selected_regions {
+    background-color: #FFFFFF;
+    text-align: center;
+  }
+  
+  .color_bars {
+    background-color: #FFFFFF;
+    text-align: right;
+  }
+  
+  .color_bars_s {
+    background-color: #FFFFFF;
+    text-align: left;
+  }
+  
+  .tttt{
+  background-color: rgba(94,78,62,1);
+   height: 15px;
+  }
+  
+  .child {
+  background-color: rgba(224,180,14,1);
+  color: #FFFFFF;
+  font-size: 15px;
+  }
+  
+  .map_picture {
+    width: 300px;
+    height: 250px;
+    background: url("images/map_picture.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: absolute;
+    top: 850px;
+    left: 61%;
+    overflow: hidden;
+  }
+  
+  body{
+    margin: 0;
+    overflow-x: hidden;
+  background-color: #5F4E3F;
+  }

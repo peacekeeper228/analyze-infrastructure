@@ -1,0 +1,171 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title>Статистика</title>
+    <style>
+        .toggle {
+            --width: 100px;
+            --height: calc(var(--width) / 6);
+
+            position: relative;
+            display: inline-block;
+            width: var(--width);
+            height: var(--height);
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+
+        .toggle input {
+            display: none;
+        }
+
+        .toggle .labels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 10px;
+            font-family: sans-serif;
+            transition: all 0.4s ease-in-out;
+        }
+
+        .toggle .labels::after {
+            content: attr(data-off);
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            color: #4d4d4d;
+            background-color: #f19999;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease-in-out;
+        }
+
+        .toggle .labels::before {
+            content: attr(data-on);
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            color: #ffffff;
+            background-color: #4fe132;
+            text-align: center;
+            opacity: 0;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
+            transition: all 0.4s ease-in-out;
+        }
+
+        .toggle input:checked~.labels::after {
+            /* flip 180deg */
+            transform: rotateY(180deg);
+            opacity: 0;
+        }
+
+        .toggle input:checked~.labels::before {
+            transform: rotateY(180deg) scale(-1, 1);
+            opacity: 1;
+        }
+
+        table.outertable {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .innertableheader {
+            width: 90%;
+        }
+
+        .settings {
+            background-color: rgba(224, 180, 14, 1);
+        }
+    </style>
+    <link href="{{ url_for('static', filename='stat_style.css') }}" rel="stylesheet" />
+</head>
+
+<body>
+    <fieldset class="settings">
+        <legend style="color: #ffffff;">Настройки сортировки</legend>
+        <span style="font-size: 30px">Поле сортировки:</span>
+        <select name="sortfields" style="font-size: 30px; flex: 1;" id="testt">
+            {% for key, value in valuesdict.items() %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+        </select><br>
+        <span style="font-size: 30px">Вид сортировки:</span>
+
+        <label class="toggle">
+            <input type="checkbox" name="sort">
+            <span class="labels" data-on="ПО ВОЗРАСТАНИЮ" data-off="ПО УБЫВАНИЮ"></span>
+        </label></p>
+        <button onclick="test();" name="button" id="newButton">Сортировать</button>
+
+    </fieldset>
+    <table border="1" id="table" class="outertable">
+        {% for districtname, districtata in models.items() %}
+        <tr>
+            <th>{{districtname}}</th>
+            <td>
+                <table border="1" class="innertable">
+                    <tbody>
+                        {% for key, value in districtata.items() %}
+                        <tr>
+                            <th class="innertableheader">{{key}}</th>
+                            <td>{{value}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <script>
+        function test() {
+            let sortDirection = document.querySelector('input[name="sort"]:checked');
+            let a = parseInt(document.getElementById("testt").value)
+
+            var n = 0;
+            var table;
+            table = document.getElementById("table");
+            var rows, i, x, y = 0;
+            var switching = true;
+            let direction = "descending";
+            if (sortDirection) {
+                direction = "ascending";
+            };
+            while (switching) {
+                switching = false;
+                var rows = table.rows;
+                for (i = 0; i < (rows.length - 1); i++) {
+                    var Switch = false;
+                    x = rows[i].cells[1].childNodes[1].rows[a].cells[1].innerText;
+                    y = rows[i + 1].cells[1].childNodes[1].rows[a].cells[1].innerText;
+                    if (direction == "ascending" && parseFloat(x) > parseFloat(y)) {
+                        Switch = true;
+                        break;
+                    } else if (direction == "descending" && parseFloat(x) < parseFloat(y)) {
+                        Switch = true;
+                        break;
+                    }
+                }
+                if (Switch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

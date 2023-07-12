@@ -1,0 +1,121 @@
+* {
+    overflow-x: hidden;
+    margin: auto;
+  }
+  body{
+    margin: 0;
+    overflow-x: hidden;
+  background-color: #5F4E3F;
+  }
+  .menu-main {
+    display: table;
+    width: 97.5%;
+    background: rgba(224,180,14,1);
+    margin: 0;
+  }
+  
+  .menu-main ul{
+    display: table-row;
+    margin: 0;
+  }
+  .menu-main li {
+      text-align: center;
+      width: 25%;
+      display: table-cell;
+      padding: 0;
+      margin: 0;
+  }
+  
+  .menu-main a {
+    line-height: normal;
+    display: inline-block;
+      
+    text-decoration: none;
+    font-family: 'Comfortaa', sans-serif;
+    position: relative;
+    color: rgba(230,232,239,1);
+    font-weight: Bold;
+    font-size: 3.5vw;
+    text-align: center;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  .about_class {
+    text-align: center;
+  color: #FFFFFF;
+  font-size: 15;
+  }
+  
+  .color_values {
+    text-align: center;
+  color: #FFFFFF;
+  font-size: 15;
+  }
+  
+  .green_picture {
+    width: 30px;
+    height: 30px;
+    background: url("images/green_color.png");
+    opacity: 1;
+    position: absolute;
+    left: 338px;
+    overflow: hidden;
+  }
+  
+  .yellow_picture {
+    width: 30px;
+    height: 30px;
+    background: url("images/yellow_color.png");
+    opacity: 1;
+    position: absolute;
+    left: 338px;
+    overflow: hidden;
+  }
+  
+  .red_picture {
+    width: 30px;
+    height: 30px;
+    background: url("images/red_color.png");
+    opacity: 1;
+    position: absolute;
+    left: 338px;
+    overflow: hidden;
+  }
+  
+  .orange_picture {
+    width: 30px;
+    height: 30px;
+    background: url("images/orange_color.png");
+    opacity: 1;
+    position: absolute;
+    left: 338px;
+    overflow: hidden;
+  }
+  
+  .blue_picture {
+    width: 30px;
+    height: 30px;
+    background: url("images/blue_color.png");
+    opacity: 1;
+    position: absolute;
+    left: 338px;
+    overflow: hidden;
+  }
+  
+  .distance_values {
+    text-align: center;
+  color: #FFFFFF;
+  font-size: 15;
+  }
+  
+  .index_values {
+    text-align: center;
+  color: #FFFFFF;
+  font-size: 15;
+  }
+  
+  table, th, td {
+    border: 1px solid;
+  }

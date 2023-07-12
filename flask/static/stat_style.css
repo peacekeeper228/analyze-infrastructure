@@ -1,0 +1,24 @@
+
+.about {
+  width: 100%;
+  align-content: center;
+  text-align: center;
+  background: #5F4E3F;
+
+  font-size: 15px;
+}
+
+body{
+  background-color: #5F4E3F;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.outertable {
+  text-align: left;
+  background-color: rgba(224,180,14,1);
+}
+.innertable {
+  text-align: left;
+  background-color: rgba(224,180,14,1);
+  }

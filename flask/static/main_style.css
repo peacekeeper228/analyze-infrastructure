@@ -1,0 +1,428 @@
+* {
+    overflow-x: hidden;
+    margin: auto;
+  }
+  body{
+    background-color: rgba(52,54,51,1);
+    margin: 0;
+    overflow-x: hidden;
+  }
+  .menu-main {
+    display: table;
+    width: 97.5%;
+    background: rgba(91,140,90,1);
+    margin: 0;
+  }
+  
+  .menu-main ul{
+    display: table-row;
+    margin: 0;
+  }
+  .menu-main li {
+      text-align: center;
+      width: 25%;
+      display: table-cell;
+      padding: 0;
+      margin: 0;
+  }
+  
+  .menu-main a {
+    line-height: normal;
+    display: inline-block;
+      
+    text-decoration: none;
+    font-family: 'Comfortaa', sans-serif;
+    position: relative;
+    color: rgba(230,232,239,1);
+    font-weight: Bold;
+    font-size: 3.5vw;
+    text-align: center;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .main_container {
+    width: 100%;
+    height: 2395px;
+    background: rgba(52,54,51,1);
+    opacity: 1;
+    margin: auto;
+  }
+  .down_menu {
+    width: 100%;
+    height: 184px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: absolute;
+    top: 2611px;
+    left: 0px;
+    overflow: hidden;
+  }
+  .v11_0 {
+    width: 100%;
+    height: 284px;
+    background: rgba(91,140,90,1);
+    opacity: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    overflow: hidden;
+  }
+  .v11_5 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 36px;
+    left: 900px;
+    font-family: Comfortaa;
+    font-weight: Regular;
+    opacity: 1;
+    text-align: left;
+  }
+  .v11_4 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 36px;
+    left: 525px;
+    font-family: Comfortaa;
+    font-weight: Regular;
+    opacity: 1;
+    text-align: left;
+  }
+  .v11_6 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 36px;
+    left: 150px;
+    font-family: Comfortaa;
+    font-weight: Regular;
+    opacity: 1;
+    text-align: left;
+  }
+  .v11_8 {
+    height: 227px;
+    opacity: 1;
+    position: absolute;
+    top: 20px;
+    left: 875px;
+    border: 1px solid rgba(161,186,165,1);
+  }
+  .v11_7 {
+    height: 227px;
+    opacity: 1;
+    position: absolute;
+    top: 20px;
+    left: 512px;
+    border: 1px solid rgba(161,186,165,1);
+  }
+  .statistics {
+    width: 100%;
+    height: 601px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: absolute;
+    top: 1211px;
+    left: 10%;
+    overflow: hidden;
+  }
+  .t9 {
+    width: 550px;
+    color: rgba(240,189,106,1);
+    position: absolute;
+    top: 101px;
+    left: 540px;
+    font-family: Comfortaa;
+    font-weight: Light;
+    font-size: 36px;
+    opacity: 1;
+    text-align: left;
+  }
+  .moscow_stat {
+    width: 500px;
+    height: 500px;
+    background: url("images/moscow_stat.png");
+    opacity: 1;
+    position: absolute;
+    top: 101px;
+    left: 0px;
+    overflow: hidden;
+  }
+  .button2_backgraund {
+    width: 500px;
+    height: 120px;
+    background: rgba(161,186,165,1);
+    opacity: 1;
+    position: absolute;
+    top: 681px;
+    left: 0px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow: hidden;
+  }
+  .about_class {
+    width: 100%;
+    height: 601px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: absolute;
+    top: 1847px;
+    left: 10%;
+    overflow: hidden;
+  }
+  .t10 {
+    width: 550px;
+    color: rgba(240,189,106,1);
+    position: absolute;
+    top: 101px;
+    left: 540px;
+    font-family: Comfortaa;
+    font-weight: Light;
+    font-size: 36px;
+    opacity: 1;
+    text-align: left;
+  }
+  .moscow_about {
+    width: 500px;
+    height: 500px;
+    background: url("images/moscow_about.jpg");
+    opacity: 1;
+    position: absolute;
+    top: 101px;
+    left: 0px;
+    overflow: hidden;
+  }
+  .arrow_B1 {
+    width: 30px;
+    opacity: 1;
+    position: absolute;
+    top: 741px;
+    left: 420px;
+    border: 2.5px solid rgba(52,54,51,1);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    background-color: rgba(52,54,51,1);
+  }
+  .t11 {
+    width: 100%;
+    color: rgba(240,189,106,1);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 78px;
+    opacity: 1;
+    text-align: left;
+  }
+  .interactive_map {
+    width: 100%;
+    height: 796px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: absolute;
+    top: 529px;
+    left: 10%;
+    overflow: hidden;
+  }
+  .t6 {
+    width: 550px;
+    color: rgba(240,189,106,1);
+    position: absolute;
+    top: 55px;
+    left: 540px;
+    font-family: Comfortaa;
+    font-weight: Light;
+    font-size: 36px;
+    opacity: 1;
+    text-align: left;
+  }
+  .moscow_map {
+    width: 500px;
+    height: 600px;
+    background: url("images/moscow_map.png");
+    opacity: 1;
+    position: absolute;
+    top: 96px;
+    left: 0px;
+    overflow: hidden;
+  }
+  .button1_backgraund {
+    width: 500px;
+    height: 120px;
+    background: rgba(161,186,165,1);
+    opacity: 1;
+    position: absolute;
+    top: 676px;
+    left: 600px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow: hidden;
+  }
+  .t7 {
+    width: 400px;
+    color: rgba(52,54,51,1);
+    position: absolute;
+    top: 715px;
+    left: 650px;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: Comfortaa;
+    font-weight: Regular;
+    font-size: 36px;
+    opacity: 1;
+    text-align: center;
+  }
+  .arrow_A1 {
+    width: 30px;
+    opacity: 1;
+    position: absolute;
+    top: 736px;
+    left: 1020px;
+    border: 2.5px solid rgba(52,54,51,1);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    background-color: rgba(52,54,51,1);
+  }
+  .t8 {
+    width: 100%;
+    color: rgba(240,189,106,1);
+    position: relative;
+    top: 0px;
+    left: 0px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 78px;
+    opacity: 1;
+    text-align: right;
+  }
+  .about {
+    width: 100%;
+    height: 374px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: absolute;
+    top: 153px;
+    left: 50px;
+    overflow: hidden;
+  }
+  .t4 {
+    width: 100%;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 200px;
+    right: 500px;
+    font-family: Comfortaa;
+    font-weight: Regular;
+    font-size: 36px;
+    opacity: 1;
+    text-align: right;
+  }
+  .t5 {
+    width: 100%;
+    color: rgba(240,189,106,1);
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 96px;
+    opacity: 1;
+    text-align: left;
+  }
+  .up_menu {
+    width: 100%;
+    height: 170px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .up_backgraund {
+    width: 100%;
+    height: 170px;
+    background: rgba(91,140,90,1);
+    opacity: 1;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    overflow: hidden;
+  }
+  .t1 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 15%;
+    left: 625px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 48px;
+    opacity: 1;
+    text-align: center;
+  }
+  .t2 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 15%;
+    left: 1000px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 48px;
+    opacity: 1;
+    text-align: center;
+  }
+  .t3 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 15%;
+    left: 250px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 48px;
+    opacity: 1;
+    text-align: center;
+  }
+  .t4 {
+    width: 350px;
+    color: rgba(230,232,239,1);
+    position: absolute;
+    top: 15%;
+    left: 250px;
+    font-family: Comfortaa;
+    font-weight: Bold;
+    font-size: 48px;
+    opacity: 1;
+    text-align: center;
+  }
+  .line1 {
+    height: 104px;
+    opacity: 1;
+    position: absolute;
+    top: 30px;
+    left: 975px;
+    border: 1px solid rgba(161,186,165,1);
+  }
+  .line2 {
+    height: 104px;
+    opacity: 1;
+    position: absolute;
+    top: 30px;
+    left: 612px;
+    border: 1px solid rgba(161,186,165,1);
+  }
