@@ -3,8 +3,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from toPostgresDB import *
 from toMongoDB import *
+from PostgresPool import PoolConnections
 
 app = FastAPI()
+PoolPostgres = PoolConnections()
 
 dictDatabases = {
     0: 'eduBuildings', #Школы
