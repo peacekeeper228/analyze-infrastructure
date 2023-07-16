@@ -1,42 +1,42 @@
 from pymongo import MongoClient
 import os
 
-class MongoDB(object):
+class dbMongo(object):
     def __init__(self):
-        self.__client = MongoClient('mongodb',
+        self._client = MongoClient('mongodb',
             username=os.environ['MONGO_LOGIN'],
             password=os.environ['MONGO_PASSWORD'])
+    def _getDatabase(self):
+        return self._client['Infrastructure']
     
-    def getAllCollections(self):
-        d = dict((db, [collection for collection in self.__client[db].list_collection_names()])
-            for db in self.__client.list_database_names())
-        return d 
-   
-    def getCentroidAndDAtaByID(self, listvalues, collection):
-        db = self.__client['Infrastructure']
-        coll = db[collection]
+    def _getCollection(self, collectionName):
+        db = self._getDatabase()
+        return db[collectionName]
+        
+class dbMongoGetAllCollections(dbMongo):
+    def query(self):
+        d = dict((db, [collection for collection in self._client[db].list_collection_names()])
+            for db in self._client.list_database_names())
+        return d
+    
+class dbMongoGetCentroidAndDAtaByID(dbMongo):
+    def query(self, listvalues, collection):
+        coll = self._getCollection(collection)
         responselist = list(coll.find({"idSpatial": {"$in": listvalues}}, { "_id": 0}).sort("idSpatial", 1))
         return responselist
     
-    def getwithincoordinates(self, poly, collection):
-        db = self.__client['Infrastructure']
-        coll = db[collection]
+class dbMongoGetWithinCoordinates(dbMongo):
+    def query(self, poly, collection):
+        coll = self._getCollection(collection)
         responselist = list(coll.find({ "geometry" : {
             "$geoIntersects": {
             "$geometry": poly
             }}}, { "_id": 0}))
         return responselist
-    
-    '''
-    {
-        "type": "Point",
-        "coordinates": [37.938057458250945, 55.70359857748261]
-    }
-    '''
 
-    def getnearcoordinates(self, poly, distance, collection):
-        db = self.__client['Infrastructure']
-        coll = db[collection]
+class dbMongoGetNearCoordinates(dbMongo):
+    def query(self, poly, distance, collection):
+        coll = self._getCollection(collection)
         responselist = list(coll.find({ "geometry" : {
             "$near" : {
                 "$geometry" : poly,
@@ -45,9 +45,9 @@ class MongoDB(object):
         }}, { "_id": 0}).sort("idSpatial", 1))
         return responselist
     
-    def getnearcoordinateswithdistance(self, poly, distance, collection):
-        db = self.__client['Infrastructure']
-        coll = db[collection]
+class dbMongoGetNearCoordinatesWithDistance(dbMongo):
+    def query(self, poly, distance, collection):
+        coll = self._getCollection(collection)
         responselist = list(coll.aggregate(
             [{ 
             "$geoNear": { 
@@ -58,4 +58,7 @@ class MongoDB(object):
             }
             },{ "$project" : { "_id" : 0, "geometry": 0} }]))
         return responselist
+    
+
+
     
