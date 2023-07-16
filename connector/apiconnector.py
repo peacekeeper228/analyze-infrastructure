@@ -1,8 +1,8 @@
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from toPostgresDB import db_start
-from toMongoDB import MongoDB
+from toPostgresDB import *
+from toMongoDB import *
 
 app = FastAPI()
 
@@ -30,24 +30,24 @@ def kindergartentype():
 
 @app.get("/counties")
 async def counties():
-    t = db_start()
-    return JSONResponse(content=t.getCounties(), status_code=200)
+    dataBaseLink = dbPostgresGetCounties()
+    return JSONResponse(content=dataBaseLink.query(), status_code=200)
 
 @app.get("/countiesname")
 async def countiesname():
-    t = db_start()
-    return [x['namecounty'] for x in t.getCounties()]
+    dataBaseLink = dbPostgresGetCounties()
+    return [x['namecounty'] for x in dataBaseLink.query()]
 
 @app.get("/districts")
 async def districts():
-    t = db_start()
-    return t.getDistricts()
+    dataBaseLink = dbPostgresGetDistricts()
+    return dataBaseLink.query()
 
 @app.post("/districts")
 async def districts(request: Request):
-    t = db_start()
+    dataBaseLink = dbPostgresGetDistrictsWithCounyNameByID()
     jsonbody = await request.json()
-    return t.getDistrictsWithCounyNameByID(jsonbody['arrayID'])
+    return dataBaseLink.query(jsonbody['arrayID'])
 '''
 {
  	"arrayID": [1,2] 
@@ -56,14 +56,14 @@ async def districts(request: Request):
 
 @app.get("/districtsname")
 async def districtsname():
-    t = db_start()
-    return {x['namedistrict']:x['namedistrict'] for x in t.getDistricts()}
+    dataBaseLink = dbPostgresGetDistricts()
+    return {x['namedistrict']:x['namedistrict'] for x in dataBaseLink.query()}
 
 @app.get("/districtcountyname")
 async def districtcountyname():
-    t = db_start()
+    dataBaseLink = dbPostgresGetDistricts()
     result = {}
-    for i in t.getDistricts():
+    for i in dataBaseLink.query():
         if i['namecounty'] not in result.keys():
             result[i['namecounty']] = [i['namedistrict']]
         else:
@@ -79,11 +79,12 @@ async def schoolsin(request: Request):
     elif jsonbody['database'] == 3:
         selecttype = kindergartentype()
     database = dictDatabases[jsonbody['database']]
-    t = db_start()
     if jsonbody['isCounty']:
-        return JSONResponse(content=t.getInCounty(jsonbody['IDsource'], database, selecttype), status_code=200)
+        dataBaseLink = dbPostgresGetInCounty()
+        return JSONResponse(content=dataBaseLink.query(jsonbody['IDsource'], database, selecttype), status_code=200)
     else:
-        return JSONResponse(content=t.getInDistrict(jsonbody['IDsource'], database, selecttype), status_code=200)
+        dataBaseLink = dbPostgresGetInDistrict()
+        return JSONResponse(content=dataBaseLink.query(jsonbody['IDsource'], database, selecttype), status_code=200)
 '''
 {
     "IDsource": "relation/1299013",
@@ -97,8 +98,8 @@ async def schoolsin(request: Request):
     database = dictDatabases[jsonbody['database']]
     if jsonbody['arrayID'] == []:
         return []
-    t = db_start()
-    return JSONResponse(content=t.getByID(jsonbody['arrayID'], database), status_code=200)
+    t = dbPostgresGetByID()
+    return JSONResponse(content=t.query(jsonbody['arrayID'], database), status_code=200)
 '''
 {
     "database": 1,
@@ -115,14 +116,15 @@ async def schoolsfull(request: Request):
     elif jsonbody['database'] == 3:
         selecttype = kindergartentype()
     database = dictDatabases[jsonbody['database']]
-    t = db_start()
     if jsonbody['isCounty']:
-        table = t.getInCounty(jsonbody['IDsource'], database, selecttype)
+        t = dbPostgresGetInCounty()
+        table = t.query(jsonbody['IDsource'], database, selecttype)
     else:
-        table = t.getInDistrict(jsonbody['IDsource'], database, selecttype)
+        t = dbPostgresGetInDistrict()
+        table = t.query(jsonbody['IDsource'], database, selecttype)
     listID = makeArrayIDspatial(table)
-    t = MongoDB()
-    tableMongo = t.getCentroidAndDAtaByID(listID, database)
+    mongoLink = dbMongoGetCentroidAndDAtaByID()
+    tableMongo = mongoLink.query(listID, database)
     result = []
     for p, m in zip(table, tableMongo):
         res = dict(p, **m)
@@ -139,18 +141,18 @@ async def schoolsfull(request: Request):
 @app.post("/districtsID")
 async def schoolsfull(request: Request):
     jsonbody = await request.json()
-    t = db_start()
-    table = t.getDistrictsByID(jsonbody['IDsource'])
+    t = dbPostgresGetDistrictsByID()
+    table = t.query(jsonbody['IDsource'])
     return JSONResponse(content=table, status_code=200)
 
 @app.post("/districtsfullinfo")
 async def schoolsfull(request: Request):
     jsonbody = await request.json()
-    t = db_start()
-    table = t.getDistrictsByName(jsonbody['IDsource'])
+    linkToPostgres = dbPostgresGetDistrictsByName()
+    table = linkToPostgres.query(jsonbody['IDsource'])
     listID = makeArrayIDspatial(table)
-    t = MongoDB()
-    tableMongo = t.getCentroidAndDAtaByID(listID, 'districts')
+    mongoLink = dbMongoGetCentroidAndDAtaByID()
+    tableMongo = mongoLink.query(listID, 'districts')
     result = []
     for p, m in zip(table, tableMongo):
         res = dict(p, **m)
@@ -162,8 +164,8 @@ async def mongolist(request: Request):
     jsonbody = await request.json()
     database = dictDatabases[jsonbody['database']]
     listID = jsonbody['listID']
-    t = MongoDB()
-    return JSONResponse(content=t.getCentroidAndDAtaByID(listID, database), status_code=200)
+    mongoLink = dbMongoGetCentroidAndDAtaByID()
+    return JSONResponse(content=mongoLink.query(listID, database), status_code=200)
 '''
 {
 	"database": 0,
@@ -173,8 +175,8 @@ async def mongolist(request: Request):
 
 @app.get("/mongocollections")
 async def mongocollections():
-    t = MongoDB()
-    return JSONResponse(content=t.getAllCollections(), status_code=200)
+    mongoLink = dbMongoGetAllCollections()
+    return JSONResponse(content=mongoLink.query(), status_code=200)
 
 @app.post("/incoordinates")
 async def incoordinates(request: Request):
@@ -190,8 +192,8 @@ async def incoordinates(request: Request):
         [Wlon, Nlat],
         [Wlon, Slat],
         [Elon, Slat]]]}
-    t = MongoDB()
-    return JSONResponse(content=t.getwithincoordinates(poly, database), status_code=200)
+    mongoLink = dbMongoGetWithinCoordinates()
+    return JSONResponse(content=mongoLink.query(poly, database), status_code=200)
 
 
 @app.post("/pointInDistrict")
@@ -202,12 +204,17 @@ async def incoordinates(request: Request):
     lon = jsonbody['lon']
     poly = { "type" : "Point", "coordinates" : 
         [lon, lat] }
-    t = MongoDB()
-    return JSONResponse(content=t.getwithincoordinates(poly, database), status_code=200)
+    mongoLink = dbMongoGetWithinCoordinates()
+    return JSONResponse(content=mongoLink.query(poly, database), status_code=200)
 '''
 {
     "lon": 37.93,
     "lat": 55.69
+}
+
+{
+    "type": "Point",
+    "coordinates": [37.938057458250945, 55.70359857748261]
 }
 '''
 
@@ -219,8 +226,8 @@ async def nearcoordinates(request: Request):
     lon = jsonbody['lon']
     distance = jsonbody['distance']
     poly = { "type" : "Point", "coordinates" : [lon, lat] }
-    t = MongoDB()
-    return JSONResponse(content=t.getnearcoordinates(poly, distance, database), status_code=200)
+    mongoLink = dbMongoGetNearCoordinates()
+    return JSONResponse(content=mongoLink.query(poly, distance, database), status_code=200)
 '''
 {
     "lon": 37.93,
@@ -237,8 +244,8 @@ async def nearcoordinatesdistance(request: Request):
     lon = jsonbody['lon']
     distance = jsonbody.get('distance', 1000)
     poly = { "type" : "Point", "coordinates" : [lon, lat] }
-    t = MongoDB()
-    return JSONResponse(content=t.getnearcoordinateswithdistance(poly, distance, database), status_code=200)
+    mongoLink = dbMongoGetNearCoordinatesWithDistance()
+    return JSONResponse(content=mongoLink.query(poly, distance, database), status_code=200)
 '''
 {
     "lon": 37.93,
@@ -257,11 +264,11 @@ async def nearcoordinates(request: Request):
     lon = jsonbody['lon']
     distance = jsonbody['distance']
     poly = { "type" : "Point", "coordinates" : [lon, lat] }
-    t = MongoDB()
-    spatialInfo = t.getnearcoordinates(poly, distance, database)
+    mongoLink = dbMongoGetNearCoordinates()
+    spatialInfo = mongoLink.query(poly, distance, database)
     arrayID = [i['idSpatial'] for i in spatialInfo]
-    db = db_start()
-    table = db.getBySpatialID(arrayID, database)
+    db = dbPostgresGetBySpatialID()
+    table = db.query(arrayID, database)
     result = []
     for p, m in zip(table, spatialInfo):
         res = dict(p, **m)
@@ -275,23 +282,23 @@ async def changesforschool(request: Request):
 
     jsonbody = await request.json()
     arraySchoolID = jsonbody.keys()
-    t1 = db_start()
-    table = t1.getByID(arraySchoolID, databaseSchool)
+    t1 = dbPostgresGetByID()
+    table = t1.query(arraySchoolID, databaseSchool)
     dictData = {}
     for i in table:
         value = (-1, 1)[jsonbody[str(i['buildid'])]]
         data = str(i['idspatial'])
         dictData[data] = value
-    t = MongoDB()
+    mongoLink = dbMongoGetCentroidAndDAtaByID()
     array1 = [int(a) for a, _ in dictData.items()]
-    tableMongo = t.getCentroidAndDAtaByID(array1, databaseSchool)
+    tableMongo = mongoLink.query(array1, databaseSchool)
     
     listOfContent = []
     for i in tableMongo:
         poly = { "type" : "Point", "coordinates" : [i['longitude'], i['latitude']] }
-        
+        mongoLink = dbMongoGetNearCoordinates()
         distance = rAvailabilityForSchool(poly)
-        spatialInfo=t.getnearcoordinates(poly, distance, databaseLiving)
+        spatialInfo = mongoLink.query(poly, distance, databaseLiving)
         for j in spatialInfo:
             flag = True
             for z in range(len(listOfContent)):
@@ -322,8 +329,8 @@ async def changesforschool(request: Request):
     return reslist
 
 def rAvailabilityForSchool(polygon):
-    t = MongoDB()
-    datadistrict = t.getwithincoordinates(polygon, "districts")
+    mongoLink = dbMongoGetWithinCoordinates()
+    datadistrict = mongoLink.query(polygon, "districts")
     districtID = datadistrict[0]["idSpatial"]
     if districtID in centralDistricts:
         return 750
@@ -345,25 +352,25 @@ centralDistricts = [
 @app.post("/districtsinfobyname")
 async def schoolsfull(request: Request):
     jsonbody = await request.json()
-    t = db_start()
-    table = t.getDistrictsByName(jsonbody['IDsource'])
+    t = dbPostgresGetDistrictsByName()
+    table = t.query(jsonbody['IDsource'])
     return table 
 
 @app.post("/countyinfobynames")
 async def schoolsfull(request: Request):
     jsonbody = await request.json()
-    t = db_start()
-    table = t.getCountiesByName(jsonbody['countynames'])
+    t = dbPostgresGetCountiesByName()
+    table = t.query(jsonbody['countynames'])
     return table 
 
 @app.post("/countybydistrict")
 async def districts(request: Request):
-    t = db_start()
+    t = dbPostgresGetCountybyIDdistrict()
     jsonbody = await request.json()
-    return t.getCountybyIDdistrict(jsonbody['districtID'])
+    return t.query(jsonbody['districtID'])
 
 @app.post("/countybydistrictname")
 async def districts(request: Request):
-    t = db_start()
+    t = dbPostgresGetCountybyDistrictName()
     jsonbody = await request.json()
-    return t.getCountybyNamedistrict(jsonbody['districtName'])
+    return t.query(jsonbody['districtName'])
