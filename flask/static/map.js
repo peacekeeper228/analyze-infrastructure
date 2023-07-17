@@ -392,12 +392,27 @@ let EditInfo = button => {
     table = field.childNodes[2];
     type = table.rows[1].cells[1].innerText
     switch (parseInt(type)) {
-        case (0): field.innerHTML = editPopupForSchool(table.rows[0].cells[1].innerText, table.rows[2].cells[1].innerText, table.rows[4].cells[1].innerText, table.rows[5].cells[1].innerText, table.rows[7].cells[1].innerText); break;
-        case (2): field.innerHTML = editPopupForLiving(table.rows[0].cells[1].innerText, field.childNodes[1].innerText, table.rows[6].cells[1].innerText); break;
-        case (3): field.innerHTML = editPopupForKindergarten(table.rows[0].cells[1].innerText, table.rows[2].cells[1].innerText, table.rows[3].cells[1].innerText); break;
+        case (0): field.innerHTML = editPopupForSchool(
+            escapeHtml(table.rows[0].cells[1].innerText),
+            escapeHtml(table.rows[2].cells[1].innerText),
+            escapeHtml(table.rows[4].cells[1].innerText),
+            escapeHtml(table.rows[5].cells[1].innerText),
+            escapeHtml(table.rows[7].cells[1].innerText)); break;
+        case (2): field.innerHTML = editPopupForLiving(
+            escapeHtml(table.rows[0].cells[1].innerText),
+            escapeHtml(field.childNodes[1].innerText),
+            escapeHtml(table.rows[6].cells[1].innerText)); break;
+        case (3): field.innerHTML = editPopupForKindergarten(
+            escapeHtml(table.rows[0].cells[1].innerText),
+            escapeHtml(table.rows[2].cells[1].innerText),
+            escapeHtml(table.rows[3].cells[1].innerText)); break;
         default: alert(type);
     }
 };
+
+const escapeHtml = (unsafe) => {
+    return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
 
 function editPopupForSchool(objectid, adress, number, load, rating) {
     html = '<p hidden>Идентификатор<input type="text" value="' + objectid + '"></p>'
