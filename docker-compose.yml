@@ -24,6 +24,7 @@ services:
 
     connector:
         image: apiconnector:latest
+        restart: always
         environment:
             MONGO_LOGIN: ${MONGO_LOGIN}
             MONGO_PASSWORD: ${MONGO_PASSWORD}

@@ -1,4 +1,15 @@
-
+class Dictionary(object):
+    @staticmethod
+    def getRusNameOrEngDefault(engName: str) -> str:
+        return dictfromdatabase.get(engName, engName)
+    @staticmethod
+    def translateDictKeysRusThrows(engDict: dict, throwKeys: list) -> dict:
+        return {Dictionary.getRusNameOrEngDefault(x): engDict[x] for x in engDict if x not in throwKeys}
+    @staticmethod
+    def translateListRus(engList: list) -> list:
+        return [Dictionary.getRusNameOrEngDefault(x) for x in engList]   
+    def getRusNameOrException(engname):
+        pass
 dictfromdatabase = {'adress': 'Адрес',
     'adults': 'Количество взрослых',
     'area': 'Площадь (м2)',

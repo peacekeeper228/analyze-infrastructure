@@ -20,17 +20,17 @@ def about():
     return render_template('about_page.html')
 
 @app.route('/statistics')
-def main_page():
+def statisticsPage():
     r = requests.get("http://connector:8000/counties")
     datacounties = json.loads(r.text)
     if len(datacounties) == 0:
         return "<h1>NO counts</h1>"
-    keyscounts = [dictfromdatabase.get(x, x) for x in list(datacounties[0].keys())]
+    keyscounts = Dictionary.translateListRus(list(datacounties[0].keys()))
     r = requests.get("http://connector:8000/districts")
     datadistricts = json.loads(r.text)
     if len(datadistricts) == 0:
         return "<h1>NO districts</h1>"
-    keysdistricts = [dictfromdatabase.get(x, x) for x in list(datadistricts[0].keys())]
+    keysdistricts = Dictionary.translateListRus(list(datadistricts[0].keys()))
     return render_template('statistics.html',
                         keyscounts = keyscounts,
                         counts=datacounties,
@@ -41,24 +41,17 @@ def main_page():
 def map_page():
     r = requests.get("http://connector:8000/districtcountyname")
     datadistricts = json.loads(r.text)
-    #return datadistricts
-    return render_template('map.html', user="test2", datadistricts=datadistricts)
+    return render_template('map.html', datadistricts=datadistricts)
 
-def without_keys(d, listThrow):
-    if listThrow == []:
-        return {dictfromdatabase.get(x, x): d[x] for x in d if x not in notUsedTypes}
-    else:
-        return {dictfromdatabase.get(x, x): d[x] for x in d if x not in listThrow}
-
-def makegeojson(data, listThrow = []):
+def makegeojson(data, listThrow = notUsedTypes):
     geojson = {
     "type": "FeatureCollection",
     "features": [
-    {
-        "type": "Feature",
-        "geometry" : d['geometry'],
-        "properties" : without_keys(d, listThrow),
-    } for d in data]
+        {
+            "type": "Feature",
+            "geometry" : d['geometry'],
+            "properties" : Dictionary.translateDictKeysRusThrows(d, listThrow),
+        } for d in data]
     }
     return geojson
 
@@ -94,24 +87,7 @@ def nearcoordinates():
     datadistrict = json.loads(r.text)
     districtID = datadistrict[0]["idSpatial"]
 
-    if districtID in centralDistricts:
-        if input_json['database'] == 0:
-            distance = 750
-        elif input_json['database'] == 1:
-            distance = 1500
-        elif input_json['database'] == 3:
-            distance = 500
-        else:
-            distance = 500
-    else:
-        if input_json['database'] == 0:
-            distance = 500
-        elif input_json['database'] == 1:
-            distance = 1500
-        elif input_json['database'] == 3:
-            distance = 300
-        else:
-            distance = 500
+    distance = Ravailability(districtID, input_json['database'])
     input_json["distance"] = distance
     input_json["database"] = 2
     r = requests.post("http://connector:8000/nearcoordinatesfullinfo", json=input_json)
@@ -121,42 +97,26 @@ def nearcoordinates():
     #return datadistricts
     return {"data":makegeojson(data=datadistricts), "radius": distance}
 
-
-def create_hexagons(data, hexagone_size):
-        polylines_list = []
-        sub_geoJson = data['geometry']
-        hexagons = []
-        #hexagons = [h3.polyfill(shapely.geometry.mapping(x)) for x in list(shapely.geometry.loads(sub_geoJson), hexagone_size)]
-        if sub_geoJson['type'] == 'Polygon':
-            hexagons = list(h3.polyfill(sub_geoJson, hexagone_size))
+def Ravailability(districtID, buildsType):
+    if districtID in centralDistricts:
+        if buildsType == 0:
+            distance = 750
+        elif buildsType == 1:
+            distance = 1500
+        elif buildsType == 3:
+            distance = 500
         else:
-            for i in sub_geoJson['coordinates']:
-                sub_sub = {"type": "Polygon", "coordinates": i}
-                hexagons.extend(list(h3.polyfill(sub_sub, hexagone_size)))
-
-        polylines = []
-        for hex in hexagons:
-            polygons = h3.h3_set_to_multi_polygon([hex], geo_json=False)
-            outlines = [loop for polygon in polygons for loop in polygon]
-            polyline = [outline + [outline[0]] for outline in outlines][0]
-            polylines.append(polyline)
-
-            polylines_list.append(polylines)
-        
-        return hexagons
-
-#Функция для отрисовки гексагонов на карте в пределах выбранных районов
-def print_hexagones(data, hexagone_size):
-    polylines_list = []
-    #maps, polygons_hex, polylines = self.create_hexagons(maps, df_target_borders.iloc[0]['geometry'])
-    for i in range(len(data['features'])):
-        polylinet = create_hexagons(data['features'][i],
-                                    hexagone_size=hexagone_size)
-        polylines_list.extend(polylinet)
-    return polylines_list
-
-    #print('list_ken', len(self.big_polygons_hex_list_regions), len(self.big_polygons_hex_list_district))
-
+            distance = 500
+    else:
+        if buildsType == 0:
+            distance = 500
+        elif buildsType == 1:
+            distance = 1500
+        elif buildsType == 3:
+            distance = 300
+        else:
+            distance = 500
+    return distance
 
 @app.route('/hexForDistricts', methods=['POST'])
 def hexForDistricts():
@@ -164,8 +124,25 @@ def hexForDistricts():
     r = requests.post("http://connector:8000/districtsfullinfo", json=input_json)
     datadistricts = json.loads(r.text)
     geojson = makegeojson(data=datadistricts)
-    return print_hexagones(geojson, hexagone_size=input_json['hexagone_size'])
+    return assembleHexagones(geojson, hexagone_size=input_json['hexagone_size'])
 
+def assembleHexagones(data, hexagone_size):
+    polylines_list = []
+    for i in range(len(data['features'])):
+        polylinet = createHexagons(data['features'][i], hexagone_size)
+        polylines_list.extend(polylinet)
+    return polylines_list
+
+def createHexagons(data, hexagone_size):
+        sub_geoJson = data['geometry']
+        hexagons = []
+        if sub_geoJson['type'] == 'Polygon':
+            hexagons = list(h3.polyfill(sub_geoJson, hexagone_size))
+        else:
+            for i in sub_geoJson['coordinates']:
+                sub_sub = {"type": "Polygon", "coordinates": i}
+                hexagons.extend(list(h3.polyfill(sub_sub, hexagone_size)))
+        return hexagons
 '''
 {
     "IDsource": ["район Ивановское", "Бабушкинский район"],
@@ -228,33 +205,32 @@ def get_provision_flag_kindergarten(districi_id, min_ob_index):
 def change_district_statistic(districts_json):
 
     dist_list = []
-    for i in districts_json:
-        object_dist = districts_json[i]['dist']
+    for i in range(len(districts_json)):
+        object_dist = districts_json[i]
         old_district_school_capacity = object_dist['schoolprovisionindex'] * object_dist['residentsnumber'] / 1000
         old_district_kinder_capacity = object_dist['kindergartenprovisionindex'] * object_dist['residentsnumber'] / 1000
         old_P = object_dist['actualprovisionindicator']
         old_N = object_dist['residentsnumber']
         old_Q = object_dist['schoolprovisionindex']
         old_D = old_P - (old_N * old_Q) / 1000
-        new_district_school_capacity = old_district_school_capacity + districts_json[i].get('school_delta', 0)
-        new_district_kinder_capacity = old_district_kinder_capacity + districts_json[i].get('kinder_delta', 0)
+        new_district_school_capacity = old_district_school_capacity + districts_json[i].get('schoolTotalCapacityDelta', 0)
+        new_district_kinder_capacity = old_district_kinder_capacity + districts_json[i].get('kinderTotalCapacityDelta', 0)
         object_dist['residentsnumber'] = object_dist['residentsnumber'] + districts_json[i].get('residents_delta', 0)
         new_schoolprovisionindex = new_district_school_capacity / object_dist['residentsnumber'] * 1000
         new_kindergartenprovisionindex = new_district_kinder_capacity / object_dist['residentsnumber'] * 1000
         new_N = object_dist['residentsnumber']
-        new_D = old_D + districts_json[i].get('students_delta', 0) - districts_json[i].get('school_delta', 0)
+        new_D = old_D + districts_json[i].get('schoolTotalStudentsDelta', 0)
         new_Q = int(new_schoolprovisionindex)
         new_P = (new_N * new_Q) / 1000 + new_D
         object_dist['schoolprovisionindex'] = new_schoolprovisionindex
         object_dist['kindergartenprovisionindex'] = new_kindergartenprovisionindex
-        object_dist['schoolprovision'] = get_provision_flag_school(i, new_schoolprovisionindex)
-        object_dist['kindergartenprovision'] = get_provision_flag_kindergarten(i, new_kindergartenprovisionindex)
+        object_dist['schoolprovision'] = get_provision_flag_school(districts_json[i]['iddistrict'], new_schoolprovisionindex)
+        object_dist['kindergartenprovision'] = get_provision_flag_kindergarten(districts_json[i]['iddistrict'], new_kindergartenprovisionindex)
         object_dist['actualprovisionindicator'] = new_P
         dist_list.append(object_dist)
 
     return dist_list
 
-#Преобразование данных по районам и округам в папке additional_code ноутбук preparation_for_statistic
 @app.route('/stat', methods=['POST', 'GET'])
 def stat(dist_list=[], sort_type=''):
     models = {}
@@ -289,7 +265,75 @@ def stat(dist_list=[], sort_type=''):
 
     return models
 
+
+def requestBuildingsFullInfo(database, arrayID):
+    postJson = {
+        "database": database,
+        "arrayID" : arrayID
+    }
+    try:
+        jsonData = requests.post(docker_net + "buildingID", json=postJson).json()
+    except:
+        jsonData = []
+    return jsonData
+    
+
+from BuildDataClasses import *
+
 @app.route('/checkchanges', methods=['POST'])
+def newchanges():
+    input_json_all = request.get_json(force=True)
+    
+    living = LivingBuildings()
+    schools = SchoolBuildings()
+    kindergartens = KindergartenBuildings()
+
+    for i in input_json_all['data']:
+        if living.checkAndInsert(i):
+            continue
+        if schools.checkAndInsert(i):
+            continue
+        if kindergartens.checkAndInsert(i):
+            continue
+        raise ValueError("type of building is undefined " + i['type'])
+    
+    livingObjects = requestBuildingsFullInfo(living.getDatabaseNumber(), living.getIDList())
+    schoolsObjects = requestBuildingsFullInfo(schools.getDatabaseNumber(), schools.getIDList())
+    kindergartensObjects = requestBuildingsFullInfo(kindergartens.getDatabaseNumber(), kindergartens.getIDList())
+    
+    districts = infoAboutSelectedDistricts(input_json_all['districts'])    
+
+    for i in livingObjects:
+        if not districts.checkInDistricts(i['iddistrict']):
+            continue
+        buildChanges = living.getDataByID(i['buildid'])
+        districts.insertChanges(i['iddistrict'], buildChanges, i)
+
+    for i in schoolsObjects:
+        if not districts.checkInDistricts(i['iddistrict']):
+            continue
+        buildChanges = schools.getDataByID(i['buildid'])
+        districts.insertChanges(i['iddistrict'], buildChanges, i)
+
+    for i in kindergartensObjects:
+        if not districts.checkInDistricts(i['iddistrict']):
+            continue
+        buildChanges = kindergartens.getDataByID(i['buildid'])
+        districts.insertChanges(i['iddistrict'], buildChanges, i)
+
+    dist_list = change_district_statistic(districts_json=districts.getDistricts())
+
+    return render_template('statistics.html',
+                            models=stat(dist_list),
+                            valuesdict=valuesdict)
+
+def infoAboutSelectedDistricts(selectedDistricts):
+    dist_post_json = {
+        "IDsource": selectedDistricts,
+    }
+    full_selected_districts = requests.post(docker_net + "districtsinfobyname", json=dist_post_json).json()
+    disricts = Districts(full_selected_districts)
+
 def changes():
     input_json_all = request.get_json(force=True)
     input_json = input_json_all['data']
@@ -318,6 +362,7 @@ def changes():
     districts_dict = {}
     #Обрабатываем все школы
     schools_object = requests.post(docker_net + "buildingID", json=schools_post_json).json()
+    
     for i in range(len(schools_object)):
         object_dist_id = schools_object[i]['iddistrict']
         if object_dist_id in districts_dict:
@@ -389,7 +434,7 @@ def changes():
     dist_post_json = {
     "IDsource": selected_districts,
     }
-    full_selected_districts = requests.post(docker_net+"districtsinfobyname", json=dist_post_json).json()
+    full_selected_districts = requests.post(docker_net + "districtsinfobyname", json=dist_post_json).json()
 
     final_dist_list = full_selected_districts.copy()
     for i in dist_list:
@@ -510,4 +555,4 @@ def changes_county():
             valuesdict=valuescounty)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug = True)

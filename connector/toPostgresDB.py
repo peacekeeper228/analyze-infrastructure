@@ -95,7 +95,18 @@ class dbPostgresGetByID(dbPostgres):
     
 class dbPostgresGetDistrictsByName(dbPostgres):
     def query(self, nameID):
-        SQLquery = """SELECT namedistrict, area, idspatial,schoolnumber, schoolload,
+        SQLquery = """SELECT namedistrict, area, idspatial, schoolnumber, schoolload,
+            kindergartennumber, medicinenumber, livingnumber, residentsnumber, avgyear, withoutschools,
+            withoutkindergartens, withoutmedicine, schoolProvisionIndex, 
+            kindergartenProvisionIndex, schoolProvision, kindergartenProvision, targetProvisionIndicator, 
+            actualProvisionIndicator, density from districts where nameDistrict in %s ORDER BY idSpatial"""
+        self._cur.execute(SQLquery, (tuple(nameID), ))
+        self._conn.commit()
+        return self._returnDict(self._cur.fetchall())
+    
+class dbPostgresGetDistrictsByNameWithID(dbPostgres):
+    def query(self, nameID):
+        SQLquery = """SELECT iddistrict, namedistrict, area, idspatial, schoolnumber, schoolload,
             kindergartennumber, medicinenumber, livingnumber, residentsnumber, avgyear, withoutschools,
             withoutkindergartens, withoutmedicine, schoolProvisionIndex, 
             kindergartenProvisionIndex, schoolProvision, kindergartenProvision, targetProvisionIndicator, 
@@ -106,7 +117,7 @@ class dbPostgresGetDistrictsByName(dbPostgres):
     
 class dbPostgresGetDistrictsByID(dbPostgres):
     def query(self, nameID):
-        SQLquery = """SELECT namedistrict, area, idspatial,schoolnumber, schoolload,
+        SQLquery = """SELECT namedistrict, area, idspatial, schoolnumber, schoolload,
             kindergartennumber, medicinenumber, livingnumber, residentsnumber, avgyear, withoutschools,
             withoutkindergartens, withoutmedicine, schoolProvisionIndex, 
             kindergartenProvisionIndex, schoolProvision, kindergartenProvision, targetProvisionIndicator, 

@@ -311,7 +311,8 @@ async def changesforschool(request: Request):
             if flag:
                 listOfContent.append({'idSpatial':j['idSpatial'], "freeschools": dictData[str(i['idSpatial'])]})
     arrayIDbuildings = [i['idSpatial'] for i in listOfContent]
-    fullDataAboutBuildings = t1.getBySpatialID(arrayIDbuildings, databaseLiving)
+    t1 = dbPostgresGetBySpatialID()
+    fullDataAboutBuildings = t1.query(arrayIDbuildings, databaseLiving)
     reslist = []
     for item in listOfContent:
         if item['freeschools'] != 0:
@@ -354,7 +355,7 @@ centralDistricts = [
 @app.post("/districtsinfobyname")
 async def schoolsfull(request: Request):
     jsonbody = await request.json()
-    t = dbPostgresGetDistrictsByName()
+    t = dbPostgresGetDistrictsByNameWithID()
     table = t.query(jsonbody['IDsource'])
     return table 
 
