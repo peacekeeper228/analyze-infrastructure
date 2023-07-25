@@ -4,7 +4,8 @@ function sendRequestForChanges(data, districts) {
         xmlHttp.open("POST", 'http://127.0.0.1:80/checkchanges', true); // false for synchronous request
         let body = JSON.stringify({
             data: data,
-            districts: districts
+            districts: districts,
+            isCounty: false
         });
         xmlHttp.onload = function () {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
@@ -21,10 +22,11 @@ function sendRequestForChanges(data, districts) {
 function sendRequestForChanges_county(data, counties) {
     return new Promise(function (resolve, reject) {
         let xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", 'http://127.0.0.1:80/checkchanges_county', true); // false for synchronous request
+        xmlHttp.open("POST", 'http://127.0.0.1:80/checkchanges', true); // false for synchronous request
         let body = JSON.stringify({
             data: data,
-            counties: counties
+            counties: counties,
+            isCounty: true
         });
         xmlHttp.onload = function () {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {

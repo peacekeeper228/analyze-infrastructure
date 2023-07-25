@@ -109,6 +109,15 @@ async def schoolsin(request: Request):
 }
 '''
 
+@app.post("/buildingIDcounty")
+async def schoolsin(request: Request):
+    jsonbody = await request.json()
+    database = dictDatabases[jsonbody['database']]
+    if jsonbody['arrayID'] == []:
+        return []
+    t = dbPostgresGetByIDWithCountyID()
+    return JSONResponse(content=t.query(jsonbody['arrayID'], database), status_code=200)
+
 @app.post("/buildingfullinfo")
 async def schoolsfull(request: Request):
     jsonbody = await request.json()
