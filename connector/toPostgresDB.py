@@ -95,7 +95,7 @@ class dbPostgresGetByID(dbPostgres):
     
 class dbPostgresGetByIDWithCountyID(dbPostgres):
     def query(self, arrayID, database):
-        SQLquery = """SELECT t.*, d.idcounty from """ + database + """ t, districts d
+        SQLquery = """SELECT t.*, d.idcount from """ + database + """ t, districts d
                 where d.iddistrict = t.iddistrict
             and t.buildid in %s ORDER BY idSpatial"""
         self._cur.execute(SQLquery, (tuple(arrayID), ))

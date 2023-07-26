@@ -4,10 +4,11 @@ import requests
 from utils import *
 import json
 import h3
-from BuildDataClasses import *
+from Buildings import *
+from typing import List
+from Municipalities import Municipalities
 app = Flask(__name__)
 
-#тестовая
 @app.route('/main_page')
 def hello_world():
     return render_template('main_page.html', user="test")
@@ -158,14 +159,6 @@ def checkforschool():
     dataAboutSchools = json.loads(r.text)
     return dataAboutSchools
 
-def change_schools_workload(dist_school_number, dist_school_load, old_number, old_capacity, new_number, new_capacity):
-    total_workload = dist_school_number * dist_school_load
-    school_old_workload = (old_number / old_capacity * 100)
-    without_one_school_workload = total_workload - school_old_workload
-    school_new_workload = ((old_number + new_number) / (old_capacity +new_capacity) * 100)
-    total_workload = (without_one_school_workload + school_new_workload) / dist_school_number
-    return total_workload
-
 def get_provision_flag_school(districi_id, min_ob_index):
     if districi_id in zone_1:
         if min_ob_index >= school_zone_1:
@@ -246,70 +239,56 @@ def requestBuildingsFullInfo(database, arrayID):
 @app.route('/checkchanges', methods=['POST'])
 def changes():
     input_json_all = request.get_json(force=True)
-        
-    living = LivingBuildings()
-    schools = SchoolBuildings()
-    kindergartens = KindergartenBuildings()
+    Buildings = BuildingsCollection() 
     
     for i in input_json_all['data']:
-        if living.checkAndInsert(i):
-            continue
-        if schools.checkAndInsert(i):
-            continue
-        if kindergartens.checkAndInsert(i):
-            continue
-        raise ValueError("type of building is undefined " + i['type'])
-     
-    livingObjects = requestBuildingsFullInfo(living.getDatabaseNumber(), living.getIDList())
-    schoolsObjects = requestBuildingsFullInfo(schools.getDatabaseNumber(), schools.getIDList())
-    kindergartensObjects = requestBuildingsFullInfo(kindergartens.getDatabaseNumber(), kindergartens.getIDList())
-    
+        Buildings.insertDataAccordingToType(i)
+
+    for i in range(len(Buildings.buildingCollection)):
+        Buildings.buildingCollection[i].setObjects(requestBuildingsFullInfo(
+            Buildings.buildingCollection[i].getDatabaseNumber(),
+            Buildings.buildingCollection[i].getIDList()))
     if input_json_all['isCounty']:
-        districts = infoAboutSelectedCounties(input_json_all['counties'])    
+        municipalities = infoAboutSelectedCounties(input_json_all['counties'])    
     else:
-        districts = infoAboutSelectedDistricts(input_json_all['districts'])
+        municipalities = infoAboutSelectedDistricts(input_json_all['districts'])
     
-    for i in livingObjects:
-        if not districts.checkInDistricts(i['iddistrict']):
-            continue
-        buildChanges = living.getDataByID(i['buildid'])
-        districts.insertChanges(i['iddistrict'], buildChanges, i)
-
-    for i in schoolsObjects:
-        if not districts.checkInDistricts(i['iddistrict']):
-            continue
-        buildChanges = schools.getDataByID(i['buildid'])
-        districts.insertChanges(i['iddistrict'], buildChanges, i)
-
-    for i in kindergartensObjects:
-        if not districts.checkInDistricts(i['iddistrict']):
-            continue
-        buildChanges = kindergartens.getDataByID(i['buildid'])
-        districts.insertChanges(i['iddistrict'], buildChanges, i)
-
+    for objectCollection in Buildings.buildingCollection:
+        for i in objectCollection.getObjects():
+            if input_json_all['isCounty']:
+                municipalityID = i['idcount']
+            else:
+                municipalityID = i['iddistrict']
+            if not municipalities.checkInMunicipalities(municipalityID):
+                continue
+            buildChanges = objectCollection.getDataByID(i['buildid'])
+            municipalities.insertChanges(municipalityID, buildChanges, i)
     if input_json_all['isCounty']:
-        models=stat_county(districts.getDistricts())   
+        models=stat_county(municipalities.getMunicipalities())   
     else:
-        dist_list = change_district_statistic(districts_json=districts.getDistricts())
+        dist_list = change_district_statistic(districts_json=municipalities.getMunicipalities())
         models=stat(dist_list)
+
     return render_template('statistics.html',
                             models=models,
                             valuesdict=valuesdict)
 
-def infoAboutSelectedDistricts(selectedDistricts):
+def infoAboutSelectedDistricts(selectedDistricts: List[str]) -> Municipalities:
     dist_post_json = {
-        "IDsource": selectedDistricts,
+        "IDsource": selectedDistricts
     }
     full_selected_districts = requests.post(docker_net + "districtsinfobyname", json=dist_post_json).json()
-    return Districts(full_selected_districts)
+    return Municipalities(full_selected_districts)
 
-def infoAboutSelectedCounties(selectedDistricts):
-    county_post_json = {'countynames': selectedDistricts}
+def infoAboutSelectedCounties(selectedDistricts: List[str]) -> Municipalities:
+    county_post_json = {
+        "countynames": selectedDistricts
+    }
     full_selected_districts = requests.post(docker_net + "countyinfobynames", json=county_post_json).json()
     for i in range(len(full_selected_districts)):
         full_selected_districts[i]['iddistrict'] = full_selected_districts[i]['idcount']
         del full_selected_districts[i]['idcount']
-    return Districts(full_selected_districts)
+    return Municipalities(full_selected_districts)
 
 def stat(dist_list=[]):
     models = {}
