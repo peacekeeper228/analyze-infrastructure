@@ -1,4 +1,15 @@
-
+class Dictionary(object):
+    @staticmethod
+    def getRusNameOrEngDefault(engName: str) -> str:
+        return dictfromdatabase.get(engName, engName)
+    @staticmethod
+    def translateDictKeysRusThrows(engDict: dict, throwKeys: list) -> dict:
+        return {Dictionary.getRusNameOrEngDefault(x): engDict[x] for x in engDict if x not in throwKeys}
+    @staticmethod
+    def translateListRus(engList: list) -> list:
+        return [Dictionary.getRusNameOrEngDefault(x) for x in engList]   
+    def getRusNameOrException(engname):
+        pass
 dictfromdatabase = {'adress': 'Адрес',
     'adults': 'Количество взрослых',
     'area': 'Площадь (м2)',
@@ -118,6 +129,45 @@ school_zone_3 = 124
 kinder_zone_1 = 46
 kinder_zone_2 = 55
 kinder_zone_3 = 63
+
+def isDisrictProvisionWithSchool(districi_id : str, min_ob_index : int) -> bool:
+    if districi_id in zone_1:
+        return min_ob_index >= school_zone_1
+    elif districi_id in zone_2:
+        return min_ob_index >= school_zone_2
+    elif districi_id in zone_3:
+        return min_ob_index >= school_zone_3
+    raise ValueError(f"District with id {districi_id} is not in zones")
+
+def isDistrictProvisionWithKindergarten(districi_id : str, min_ob_index : int) -> bool:
+    if districi_id in zone_1:
+        return min_ob_index >= kinder_zone_1
+    elif districi_id in zone_2:
+        return min_ob_index >= kinder_zone_2
+    elif districi_id in zone_3:
+        return min_ob_index >= kinder_zone_3
+    raise ValueError(f"District with id {districi_id} is not in zones")
+
+def Ravailability(districtID, buildsType):
+    if districtID in centralDistricts:
+        if buildsType == 0:
+            distance = 750
+        elif buildsType == 1:
+            distance = 1500
+        elif buildsType == 3:
+            distance = 500
+        else:
+            distance = 500
+    else:
+        if buildsType == 0:
+            distance = 500
+        elif buildsType == 1:
+            distance = 1500
+        elif buildsType == 3:
+            distance = 300
+        else:
+            distance = 500
+    return distance
 
 def schooltype():
     return " and t.nameType = 'Школа' "
