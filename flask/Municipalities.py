@@ -1,40 +1,35 @@
+from typing import Dict, List, Set, Union
 class Municipalities(object):
     _districtsID = set()
     _districts = []
 
-    def __init__(self, data : dict) -> None:
+    def __init__(self, data : Dict[str, Union[str, int, float]]) -> None:
         self._districts = data
         self._districtsID = set([i['iddistrict'] for i in data])
 
-    def insertID(self, id):
-        self._districtsID.add(id)
+    def insertID(self, districtID : str) -> None:
+        self._districtsID.add(districtID)
 
-    def getMunicipality(self, districtID):
+    def getMunicipality(self, districtID : str) -> Dict[str, Union[str, int, float]]:
         for i in self._districts:
             if districtID == i['iddistrict']:
                 return i
             
-    def getNumberMunicipality(self, districtID):
+    def getNumberMunicipality(self, districtID : str) -> int:
         for i in range(len(self._districts)):
             if districtID == self._districts[i]['iddistrict']:
                 return i
     
-    def getMunicipalitiesID(self):
+    def getMunicipalitiesID(self) -> Set[str]:
         return self._districtsID
     
-    def checkInMunicipalities(self, idDistrict):
+    def checkInMunicipalities(self, idDistrict : str) -> bool:
         return idDistrict in self._districtsID
     
-    def getMunicipalities(self):
+    def getMunicipalities(self) -> List[dict]:
         return self._districts
     
-    def returnDict(self):
-        dictDistricts = {}
-        keys = ['iddistrict']
-        for i in self._districts:
-            dictDistricts[i['iddistrict']] = {k: v for k, v in i.items() if k not in keys}
-    
-    def insertChanges(self, districtID, dictChanges, dictData):
+    def insertChanges(self, districtID : str, dictChanges : dict, dictData : Dict[str, Union[str, int, float]]) -> None:
         NumberInArray = self.getNumberMunicipality(districtID)
         if dictChanges['type'] == 'Детский сад':
             self._districts[NumberInArray]['kinderTotalCapacityDelta'] = self._districts[NumberInArray].get('kinderTotalCapacityDelta', 0) + dictChanges.get('Номинальная вместимость', 0)
@@ -51,10 +46,10 @@ class Municipalities(object):
                 oldWorkloadInSchool,
                 newWorkloadInSchool)
 
-def changeWorkloadInDistrict(numberOfSchoolsInDistrict, averageSchoolLoadInDistrict, oldWorkloadInSchool, newWorkloadInSchool):
+def changeWorkloadInDistrict(numberOfSchoolsInDistrict : int, averageSchoolLoadInDistrict : float, oldWorkloadInSchool : int, newWorkloadInSchool : int):
     oldTotalWorkloadInDistrict = numberOfSchoolsInDistrict * averageSchoolLoadInDistrict
     newAverageSchoolLoadInDistrict = (oldTotalWorkloadInDistrict - oldWorkloadInSchool + newWorkloadInSchool) / numberOfSchoolsInDistrict
     return newAverageSchoolLoadInDistrict
 
-def calculateWorkloadInSchool(numberOfStudents, schoolCapacity):
+def calculateWorkloadInSchool(numberOfStudents : int, schoolCapacity : int):
     return (numberOfStudents / schoolCapacity) * 100

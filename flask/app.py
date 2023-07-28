@@ -96,29 +96,7 @@ def nearcoordinates():
     if r.text == '[]':
         return '[]' 
     datadistricts = json.loads(r.text)
-    #return datadistricts
     return {"data":makegeojson(data=datadistricts), "radius": distance}
-
-def Ravailability(districtID, buildsType):
-    if districtID in centralDistricts:
-        if buildsType == 0:
-            distance = 750
-        elif buildsType == 1:
-            distance = 1500
-        elif buildsType == 3:
-            distance = 500
-        else:
-            distance = 500
-    else:
-        if buildsType == 0:
-            distance = 500
-        elif buildsType == 1:
-            distance = 1500
-        elif buildsType == 3:
-            distance = 300
-        else:
-            distance = 500
-    return distance
 
 @app.route('/hexForDistricts', methods=['POST'])
 def hexForDistricts():
@@ -158,43 +136,6 @@ def checkforschool():
     r = requests.post("http://connector:8000/changesforschool", json=input_json)
     dataAboutSchools = json.loads(r.text)
     return dataAboutSchools
-
-def get_provision_flag_school(districi_id, min_ob_index):
-    if districi_id in zone_1:
-        if min_ob_index >= school_zone_1:
-            is_min_ob = 1
-        else:
-            is_min_ob = 0
-    elif districi_id in zone_2:
-        if min_ob_index >= school_zone_2:
-            is_min_ob = 1
-        else:
-            is_min_ob = 0
-    elif districi_id in zone_3:
-        if min_ob_index >= school_zone_3:
-            is_min_ob = 1
-        else:
-            is_min_ob = 0
-    return is_min_ob == 1
-
-def get_provision_flag_kindergarten(districi_id, min_ob_index):
-    if districi_id in zone_1:
-        if min_ob_index >= kinder_zone_1:
-            is_min_ob = 1
-        else:
-            is_min_ob = 0
-    elif districi_id in zone_2:
-        if min_ob_index >= kinder_zone_2:
-            is_min_ob = 1
-        else:
-            is_min_ob = 0
-    elif districi_id in zone_3:
-        if min_ob_index >= kinder_zone_3:
-            is_min_ob = 1
-        else:
-            is_min_ob = 0
-
-    return is_min_ob == 1
     
 def change_district_statistic(districts_json):
 
@@ -218,8 +159,8 @@ def change_district_statistic(districts_json):
         new_P = (new_N * new_Q) / 1000 + new_D
         object_dist['schoolprovisionindex'] = new_schoolprovisionindex
         object_dist['kindergartenprovisionindex'] = new_kindergartenprovisionindex
-        object_dist['schoolprovision'] = get_provision_flag_school(districts_json[i]['iddistrict'], new_schoolprovisionindex)
-        object_dist['kindergartenprovision'] = get_provision_flag_kindergarten(districts_json[i]['iddistrict'], new_kindergartenprovisionindex)
+        object_dist['schoolprovision'] = isDisrictProvisionWithSchool(districts_json[i]['iddistrict'], new_schoolprovisionindex)
+        object_dist['kindergartenprovision'] = isDistrictProvisionWithKindergarten(districts_json[i]['iddistrict'], new_kindergartenprovisionindex)
         object_dist['actualprovisionindicator'] = new_P
         dist_list.append(object_dist)
 
@@ -264,10 +205,10 @@ def changes():
             buildChanges = objectCollection.getDataByID(i['buildid'])
             municipalities.insertChanges(municipalityID, buildChanges, i)
     if input_json_all['isCounty']:
-        models=stat_county(municipalities.getMunicipalities())   
+        models=transformInfoCounties(municipalities.getMunicipalities())   
     else:
         dist_list = change_district_statistic(districts_json=municipalities.getMunicipalities())
-        models=stat(dist_list)
+        models=transformInfoDistricts(dist_list)
 
     return render_template('statistics.html',
                             models=models,
@@ -290,7 +231,7 @@ def infoAboutSelectedCounties(selectedDistricts: List[str]) -> Municipalities:
         del full_selected_districts[i]['idcount']
     return Municipalities(full_selected_districts)
 
-def stat(dist_list=[]):
+def transformInfoDistricts(dist_list=[]):
     models = {}
     if len(dist_list) > 0:
         for i in dist_list:
@@ -321,7 +262,7 @@ def stat(dist_list=[]):
 
     return models
 
-def stat_county(county_list):
+def transformInfoCounties(county_list):
     models = {}
     if len(county_list) > 0:
         for i in county_list:
