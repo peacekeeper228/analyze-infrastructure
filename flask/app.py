@@ -3,10 +3,11 @@ from flask import render_template, request
 import requests
 from utils import *
 import json
-import h3
 from Buildings import *
 from typing import List
-from Municipalities import Municipalities
+from Municipality import Municipalities
+from models import *
+from workingWithHexagones import *
 app = Flask(__name__)
 
 @app.route('/main_page')
@@ -21,41 +22,11 @@ def basic_page():
 def about():
     return render_template('about_page.html')
 
-@app.route('/statistics')
-def statisticsPage():
-    r = requests.get("http://connector:8000/counties")
-    datacounties = json.loads(r.text)
-    if len(datacounties) == 0:
-        return "<h1>NO counts</h1>"
-    keyscounts = Dictionary.translateListRus(list(datacounties[0].keys()))
-    r = requests.get("http://connector:8000/districts")
-    datadistricts = json.loads(r.text)
-    if len(datadistricts) == 0:
-        return "<h1>NO districts</h1>"
-    keysdistricts = Dictionary.translateListRus(list(datadistricts[0].keys()))
-    return render_template('statistics.html',
-                        keyscounts = keyscounts,
-                        counts=datacounties,
-                        keysdistricts=keysdistricts,
-                        datadistricts=datadistricts)
-
 @app.route('/map')
 def map_page():
     r = requests.get("http://connector:8000/districtcountyname")
     datadistricts = json.loads(r.text)
     return render_template('map.html', datadistricts=datadistricts)
-
-def makegeojson(data, listThrow = notUsedTypes):
-    geojson = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry" : d['geometry'],
-            "properties" : Dictionary.translateDictKeysRusThrows(d, listThrow),
-        } for d in data]
-    }
-    return geojson
 
 @app.route('/buildingfullinfo', methods=['POST'])
 def buildingfullinfo():
@@ -63,32 +34,19 @@ def buildingfullinfo():
     database = input_json['database']   
     r = requests.post("http://connector:8000/buildingfullinfo", json=input_json)
     datadistricts = json.loads(r.text)
-    if database == 0:
-        throwList = ['eoid', 'geometry', 'idspatial', 'shortname', 'totalarea', 'nametype', 'storey']
-        return makegeojson(data=datadistricts, listThrow=throwList)
-    elif database == 3:
-        throwList = ['eoid', 'geometry', 'idspatial', 'shortname', 'totalarea', 'nametype', 'storey', 'currentworkload']
-        return makegeojson(data=datadistricts, listThrow=throwList)
-    elif database == 1:
-        throwList = ['eoid', 'geometry', 'idspatial', 'totalarea', 'medtype', 'storey', 'area', 'website']
-        return makegeojson(data=datadistricts, listThrow=throwList)
-    else:
-        return makegeojson(data=datadistricts)
+    return makeGeojson(datadistricts, throwListForDatabases[database])
 
 @app.route('/districtsfullinfo', methods=['POST'])
 def districtsfullinfo():
     input_json = request.get_json(force=True)
     r = requests.post("http://connector:8000/districtsfullinfo", json=input_json)
     datadistricts = json.loads(r.text)
-    return makegeojson(data=datadistricts)
+    return makeGeojson(data=datadistricts)
 
 @app.route('/nearcoordinates', methods=['POST'])
 def nearcoordinates():
     input_json = request.get_json(force=True)
-    r = requests.post("http://connector:8000/pointInDistrict", json=input_json)
-    datadistrict = json.loads(r.text)
-    districtID = datadistrict[0]["idSpatial"]
-
+    districtID = getSpatialIDDistrictByCoordinates(input_json['database'], input_json['database'])
     distance = Ravailability(districtID, input_json['database'])
     input_json["distance"] = distance
     input_json["database"] = 2
@@ -96,33 +54,16 @@ def nearcoordinates():
     if r.text == '[]':
         return '[]' 
     datadistricts = json.loads(r.text)
-    return {"data":makegeojson(data=datadistricts), "radius": distance}
+    return {"data":makeGeojson(data=datadistricts), "radius": distance}
 
 @app.route('/hexForDistricts', methods=['POST'])
 def hexForDistricts():
     input_json = request.get_json(force=True)
     r = requests.post("http://connector:8000/districtsfullinfo", json=input_json)
     datadistricts = json.loads(r.text)
-    geojson = makegeojson(data=datadistricts)
+    geojson = makeGeojson(data=datadistricts)
     return assembleHexagones(geojson, hexagone_size=input_json['hexagone_size'])
 
-def assembleHexagones(data, hexagone_size):
-    polylines_list = []
-    for i in range(len(data['features'])):
-        polylinet = createHexagons(data['features'][i], hexagone_size)
-        polylines_list.extend(polylinet)
-    return polylines_list
-
-def createHexagons(data, hexagone_size):
-        sub_geoJson = data['geometry']
-        hexagons = []
-        if sub_geoJson['type'] == 'Polygon':
-            hexagons = list(h3.polyfill(sub_geoJson, hexagone_size))
-        else:
-            for i in sub_geoJson['coordinates']:
-                sub_sub = {"type": "Polygon", "coordinates": i}
-                hexagons.extend(list(h3.polyfill(sub_sub, hexagone_size)))
-        return hexagons
 '''
 {
     "IDsource": ["район Ивановское", "Бабушкинский район"],
@@ -166,17 +107,6 @@ def change_district_statistic(districts_json):
 
     return dist_list
 
-def requestBuildingsFullInfo(database, arrayID):
-    postJson = {
-        "database": database,
-        "arrayID" : arrayID
-    }
-    try:
-        jsonData = requests.post(docker_net + "buildingIDcounty", json=postJson).json()
-    except:
-        jsonData = []
-    return jsonData
-
 @app.route('/checkchanges', methods=['POST'])
 def changes():
     input_json_all = request.get_json(force=True)
@@ -213,23 +143,6 @@ def changes():
     return render_template('statistics.html',
                             models=models,
                             valuesdict=valuesdict)
-
-def infoAboutSelectedDistricts(selectedDistricts: List[str]) -> Municipalities:
-    dist_post_json = {
-        "IDsource": selectedDistricts
-    }
-    full_selected_districts = requests.post(docker_net + "districtsinfobyname", json=dist_post_json).json()
-    return Municipalities(full_selected_districts)
-
-def infoAboutSelectedCounties(selectedDistricts: List[str]) -> Municipalities:
-    county_post_json = {
-        "countynames": selectedDistricts
-    }
-    full_selected_districts = requests.post(docker_net + "countyinfobynames", json=county_post_json).json()
-    for i in range(len(full_selected_districts)):
-        full_selected_districts[i]['iddistrict'] = full_selected_districts[i]['idcount']
-        del full_selected_districts[i]['idcount']
-    return Municipalities(full_selected_districts)
 
 def transformInfoDistricts(dist_list=[]):
     models = {}

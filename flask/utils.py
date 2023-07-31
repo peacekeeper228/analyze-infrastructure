@@ -3,13 +3,11 @@ class Dictionary(object):
     def getRusNameOrEngDefault(engName: str) -> str:
         return dictfromdatabase.get(engName, engName)
     @staticmethod
-    def translateDictKeysRusThrows(engDict: dict, throwKeys: list) -> dict:
+    def translateDictKeysRusThrows(engDict: dict, throwKeys: list = []) -> dict:
         return {Dictionary.getRusNameOrEngDefault(x): engDict[x] for x in engDict if x not in throwKeys}
     @staticmethod
     def translateListRus(engList: list) -> list:
         return [Dictionary.getRusNameOrEngDefault(x) for x in engList]   
-    def getRusNameOrException(engname):
-        pass
 dictfromdatabase = {'adress': 'Адрес',
     'adults': 'Количество взрослых',
     'area': 'Площадь (м2)',
@@ -130,6 +128,13 @@ kinder_zone_1 = 46
 kinder_zone_2 = 55
 kinder_zone_3 = 63
 
+throwListForDatabases = {
+    0: ['eoid', 'geometry', 'idspatial', 'shortname', 'totalarea', 'nametype', 'storey'],
+    1: ['eoid', 'geometry', 'idspatial', 'totalarea', 'medtype', 'storey', 'area', 'website'],
+    2: ['geometry', 'flats', 'idspatial', 'eoid', 'storey', 'totalarea' 'website'],
+    3: ['eoid', 'geometry', 'idspatial', 'shortname', 'totalarea', 'nametype', 'storey', 'currentworkload'],
+}
+
 def isDisrictProvisionWithSchool(districi_id : str, min_ob_index : int) -> bool:
     if districi_id in zone_1:
         return min_ob_index >= school_zone_1
@@ -151,23 +156,19 @@ def isDistrictProvisionWithKindergarten(districi_id : str, min_ob_index : int) -
 def Ravailability(districtID, buildsType):
     if districtID in centralDistricts:
         if buildsType == 0:
-            distance = 750
+            return 750
         elif buildsType == 1:
-            distance = 1500
+            return 1500
         elif buildsType == 3:
-            distance = 500
-        else:
-            distance = 500
+            return 500
     else:
         if buildsType == 0:
-            distance = 500
+            return 500
         elif buildsType == 1:
-            distance = 1500
+            return 1500
         elif buildsType == 3:
-            distance = 300
-        else:
-            distance = 500
-    return distance
+            return 300
+    raise ValueError(f"R availability can not be calculated for district {districtID} and building type {buildsType}")
 
 def schooltype():
     return " and t.nameType = 'Школа' "
@@ -203,6 +204,19 @@ valuescounty = {
     2:'Средняя загруженность школ'
 
 }
+
+def makeGeojson(data, listThrow = notUsedTypes):
+    listThrow.append('geometry')
+    geojson = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry" : d['geometry'],
+            "properties" : Dictionary.translateDictKeysRusThrows(d, listThrow),
+        } for d in data]
+    }
+    return geojson
 
 docker_net = "http://connector:8000/"
 #out_net = "http://127.0.0.1:8008/"

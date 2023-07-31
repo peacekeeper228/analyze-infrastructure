@@ -3,22 +3,25 @@ class Municipalities(object):
     _districtsID = set()
     _districts = []
 
-    def __init__(self, data : Dict[str, Union[str, int, float]]) -> None:
+    def __init__(self, data : List[Dict[str, Union[str, int, float]]]) -> None:
         self._districts = data
         self._districtsID = set([i['iddistrict'] for i in data])
 
-    def insertID(self, districtID : str) -> None:
-        self._districtsID.add(districtID)
+    #is not used but I'm not sure
+    #def insertID(self, districtID : str) -> None:
+    #    self._districtsID.add(districtID)
 
     def getMunicipality(self, districtID : str) -> Dict[str, Union[str, int, float]]:
         for i in self._districts:
             if districtID == i['iddistrict']:
                 return i
+        raise ValueError("Муниципалитет с таким идентификатором не найден")
             
     def getNumberMunicipality(self, districtID : str) -> int:
         for i in range(len(self._districts)):
             if districtID == self._districts[i]['iddistrict']:
                 return i
+        raise ValueError("Муниципалитет с таким идентификатором не найден")
     
     def getMunicipalitiesID(self) -> Set[str]:
         return self._districtsID
@@ -29,7 +32,7 @@ class Municipalities(object):
     def getMunicipalities(self) -> List[dict]:
         return self._districts
     
-    def insertChanges(self, districtID : str, dictChanges : dict, dictData : Dict[str, Union[str, int, float]]) -> None:
+    def insertChanges(self, districtID : str, dictChanges : dict, dictData : Dict[str, Union[str, int, float]] = {}) -> None:
         NumberInArray = self.getNumberMunicipality(districtID)
         if dictChanges['type'] == 'Детский сад':
             self._districts[NumberInArray]['kinderTotalCapacityDelta'] = self._districts[NumberInArray].get('kinderTotalCapacityDelta', 0) + dictChanges.get('Номинальная вместимость', 0)
