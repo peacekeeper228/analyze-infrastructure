@@ -6,11 +6,11 @@ class InfoBuildings(object):
         self._listID = []
         self._json = []
 
-    def insertData(self, data : Dict[str, Union[str, int, float]]) -> None:
+    def __insertData(self, data : Dict[str, Union[str, int, float]]) -> None:
         self._json.append(data)
         self._listID.append(data['id'])
 
-    def getIDList(self) -> str:
+    def getIDList(self) -> List[str]:
         return self._listID
     
     def getDatabaseNumber(self) -> int:
@@ -18,7 +18,7 @@ class InfoBuildings(object):
     
     def checkAndInsert(self, data : Dict[str, Union[str, int, float]]) -> bool:
         if data['type'] == self._typeOfBuilding:
-            self.insertData(data)
+            self.__insertData(data)
             return True
         return False
     
@@ -29,6 +29,7 @@ class InfoBuildings(object):
         for i in self._json:
             if i['id'] == buildid:
                 return i
+        raise ValueError("Объект с таким идентификатором не найден")
     
     def setObjects(self, data : List[Dict[str, Union[str, int, float]]]) -> None:
         self.__objects = data
@@ -60,4 +61,4 @@ class BuildingsCollection(object):
         for i in self.buildingCollection:
             if i.checkAndInsert(data):
                 return
-        raise ValueError("type of building is undefined " + i['type'])
+        raise ValueError("type of building is undefined " + data['type'])
