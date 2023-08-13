@@ -7,11 +7,13 @@ from Buildings import *
 from typing import List
 from Municipality import Municipalities
 from models import *
+
 from formula import *
 from Districts import District
 from workingWithHexagones import *
 from typing import List
 from .changingStatistics import changeDistrictStatistic, transformInfoCounties, transformInfoDistricts
+
 app = Flask(__name__)
 
 @app.route('/main_page')
@@ -118,7 +120,6 @@ def changes():
     return render_template('statistics.html',
                             models=models,
                             valuesdict=valuesdict)
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
