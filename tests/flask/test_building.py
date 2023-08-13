@@ -4,8 +4,7 @@ import pytest
 import requests
 import requests_mock
 
-sys.path.append( os.path.join( os.path.dirname(__file__), ".." ))
-
+sys.path.append( os.path.join( os.path.dirname(__file__), "..." ))
 from flask.Buildings import BuildingsCollection, LivingBuildings
 
 dataLiving = {'type': 'Жилое', 'id': '1'}

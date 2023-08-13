@@ -4,10 +4,9 @@ import pytest
 import requests
 import requests_mock
 
-sys.path.append( os.path.join( os.path.dirname(__file__), ".." ))
-from flask.models import requestBuildingsFullInfo, getSpatialIDDistrictByCoordinates, infoAboutSelectedCounties, infoAboutSelectedDistricts
+sys.path.append( os.path.join( os.path.dirname(__file__), "..." ))
+from flask.models import *
 from flask.utils import docker_net
-from flask.Municipality import Municipalities
 
 def test_GetInformationAboutBuilding(requests_mock):
     requests_mock.post(f'{docker_net}buildingIDcounty', json=['aa'])

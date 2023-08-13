@@ -1,10 +1,8 @@
 import sys
 import os
 import pytest
-import requests
-import requests_mock
 
-sys.path.append( os.path.join( os.path.dirname(__file__), ".." ))
+sys.path.append( os.path.join( os.path.dirname(__file__), "..." ))
 from flask.Municipality import Municipalities
 
 municipality1 = {'iddistrict': '10', 'schoolnumber': 2, 'schoolload': 50}

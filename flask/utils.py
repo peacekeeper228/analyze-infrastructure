@@ -153,6 +153,20 @@ def isDistrictProvisionWithKindergarten(districi_id : str, min_ob_index : int) -
         return min_ob_index >= kinder_zone_3
     raise ValueError(f"District with id {districi_id} is not in zones")
 
+def calculateNewIndex(index : int, deltaCapacity : int, rezidentsNumber : int) -> int:
+    old_district_school_capacity = calculateCapacity(
+        index,
+        rezidentsNumber)
+    new_district_school_capacity = old_district_school_capacity + deltaCapacity
+    new_schoolprovisionindex = calculateIndex(new_district_school_capacity, rezidentsNumber)
+    return new_schoolprovisionindex
+
+def calculateCapacity(index : int, residentsNumber : int) -> int:
+    return (index * residentsNumber) / 1000
+
+def calculateIndex(capacity : int, residentsNumber : int) -> int:
+    return int(capacity * 1000 / residentsNumber)
+
 def Ravailability(districtID, buildsType):
     if districtID in centralDistricts:
         if buildsType == 0:
@@ -202,7 +216,6 @@ valuescounty = {
     9:'Процент домов вне зоны пешей доступности от детских садов',
     10:'Процент домов вне зоны пешей доступности от мед учреждений',
     2:'Средняя загруженность школ'
-
 }
 
 def makeGeojson(data, listThrow = notUsedTypes):

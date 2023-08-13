@@ -10,6 +10,13 @@ CREATE TABLE medTypes
     nameType CHARACTER VARYING(20) PRIMARY KEY
 );
 
+CREATE TABLE zones
+(
+    name CHARACTER VARYING(20) PRIMARY KEY
+    schoolValue INTEGER,
+    kindergartenValue INTEGER
+);
+
 --basic tables
 
 CREATE TABLE counties

@@ -4,10 +4,10 @@ import pytest
 import requests
 import requests_mock
 
-sys.path.append( os.path.join( os.path.dirname(__file__), ".." ))
+sys.path.append( os.path.join( os.path.dirname(__file__), "..." ))
 from flask.Municipality import calculateWorkloadInSchool, changeWorkloadInDistrict
-from flask.utils import isDisrictProvisionWithSchool, isDistrictProvisionWithKindergarten, Dictionary, Ravailability, schooltype, kindergartentype, makeGeojson
-
+from flask.utils import isDisrictProvisionWithSchool, isDistrictProvisionWithKindergarten, Dictionary, Ravailability, schooltype, kindergartentype, makeGeojson, calculateCapacity, calculateIndex, calculateNewIndex
+from flask.formula import calculateD, calculateP
 #sys.path.append( os.path.join( os.path.dirname(__file__), "..", "flask", "models" ))
 
 def test_calculatingWorkload():
@@ -55,15 +55,14 @@ def test_Ravailability():
     assert Ravailability(districtID, 0) == 500
     assert Ravailability(districtID, 1) == 1500
     assert Ravailability(districtID, 3) == 300
+    with pytest.raises(ValueError):
+        assert Ravailability(100, 10)
 
 def test_schooltype():
     assert schooltype() == " and t.nameType = 'Школа' "
 
 def test_kindergartentype():
     assert kindergartentype() == " and t.nameType = 'Детский сад' "
-
-    with pytest.raises(ValueError):
-        assert Ravailability(100, 10)
 
 def test_dictionary():
     assert Dictionary.getRusNameOrEngDefault("sdfsdk") == "sdfsdk"
@@ -104,3 +103,32 @@ def test_makeGeojson():
         }]
     }
     assert makeGeojson(data, ["sdfsdk"]) == expected_dict
+
+def test_calculateP():
+    calculus = calculateP(
+        100.0,
+        10.0,
+        123
+    )
+    assert calculus.calculate() == 124
+
+def test_calculateD():
+    calculus = calculateD(
+        200,
+        100.0,
+        10.0
+    )
+    assert calculus.calculate() == 199
+
+def test_calculateCapacity():
+    assert calculateCapacity(25, 10000) == 250
+    assert calculateCapacity(12, 100) == 1.2
+
+def test_calculateIndex():
+    assert calculateIndex(23, 1000) == 23
+    with pytest.raises(ZeroDivisionError):
+        calculateIndex(23, 0)
+
+def test_calculateNewIndex():
+    assert calculateNewIndex(45, 10, 1000) == 55
+    assert calculateNewIndex(33, 0, 12340) == 33
