@@ -12,8 +12,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [14.x]
+
     steps:
     - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}      
+      uses: actions/setup-node@v1
     - name: "Build connector"
       run: docker build --pull --rm -f "connector/Dockerfile" -t apiconnector:latest "connector"
     - name: "Build flask"
@@ -26,3 +32,23 @@ jobs:
       run: docker ps -a
     - name: "check databases by curl, not postman by now"
       run: curl http://127.0.0.1:8008/mongocollections
+    
+    
+    - name: Install newman
+      run: |
+        npm install -g newman
+        npm install -g newman-reporter-htmlextra
+
+    - name: Make Directory for Test Results
+        run: mkdir -p testArtifacts
+ 
+ 
+      # Run postman collection
+      - name: Run Postman Collection        
+        run: |
+          newman  run tests/apiconnector
+      - name: Output the results
+        uses: actions/upload-artifact@v2
+        with:
+         name: Reports
+         path: testArtifacts

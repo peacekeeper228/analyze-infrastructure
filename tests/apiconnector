@@ -26,7 +26,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://apiconnector:8008/counties",
+					"raw": "http://127.0.0.1:8008/counties",
 					"protocol": "http",
 					"host": [
 						"apiconnector"
@@ -95,7 +95,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8008/districts",
+					"raw": "{{base_url}}/districts",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -140,7 +140,7 @@
 		},
 		{
 			"key": "base_url",
-			"value": "https://postman-rest-api-learner.glitch.me/"
+			"value": "http://127.0.0.1:8008"
 		}
 	]
 }
