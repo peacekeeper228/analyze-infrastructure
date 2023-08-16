@@ -29,7 +29,10 @@
 					"raw": "http://127.0.0.1:8008/counties",
 					"protocol": "http",
 					"host": [
-						"apiconnector"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "8008",
 					"path": [
@@ -95,7 +98,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/districts",
+					"raw": "http://127.0.0.1:8008/districts",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -109,6 +112,119 @@
 					]
 				},
 				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
+			"name": "districts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"pm.test(\"The same id\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"arrayID\":[106]}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8008/districts",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8008",
+					"path": [
+						"districts"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "BuildingID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"let jsonData = pm.response.json();",
+							"let medObj = jsonData[0];",
+							"pm.test(\"The same id\", function () {",
+							"    pm.expect(medObj.buildid).to.eql(1);",
+							"});",
+							"pm.test(\"Other properties\", function () {",
+							"    pm.expect(medObj.fullname).to.eql(\"Федеральный медицинский центр\");",
+							"    pm.expect(medObj.website).to.eql(\"NaN\");",
+							"    pm.expect(medObj.adress).to.eql(\"Каланчёвская улица 31\");",
+							"    pm.expect(medObj.area).to.eql(902.0);",
+							"    pm.expect(medObj.storey).to.eql(0);",
+							"    pm.expect(medObj.idspatial).to.eql(618);",
+							"    pm.expect(medObj.medtype).to.eql(\"Больница\");",
+							"    pm.expect(medObj.iddistrict).to.eql(\"relation/1257218\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"database\": 1,\n    \"arrayID\" : [1]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8008/buildingID",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8008",
+					"path": [
+						"buildingID"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
 			},
 			"response": []
 		}
@@ -140,7 +256,7 @@
 		},
 		{
 			"key": "base_url",
-			"value": "http://127.0.0.1:8008"
+			"value": "https://postman-rest-api-learner.glitch.me/"
 		}
 	]
 }

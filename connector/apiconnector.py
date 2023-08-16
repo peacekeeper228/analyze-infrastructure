@@ -46,6 +46,7 @@ async def districts():
     return dataBaseLink.query()
 
 @app.post("/districts")
+#BY SPATIAL ID!!!!
 async def districts(request: Request):
     dataBaseLink = dbPostgresGetDistrictsWithCounyNameByID()
     jsonbody = await request.json()
