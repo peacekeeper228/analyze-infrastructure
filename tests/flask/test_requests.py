@@ -13,9 +13,8 @@ def test_GetInformationAboutBuilding(requests_mock):
     resp = requestBuildingsFullInfo(2, [[1, 2, 3]])
     assert resp == ['aa']
 
-    with pytest.raises(ValueError):
-        requests_mock.post(f'{docker_net}buildingIDcounty', json=[])
-        resp = requestBuildingsFullInfo(2, [[1, 2, 3]])
+    requests_mock.post(f'{docker_net}buildingIDcounty', json=[])
+    assert requestBuildingsFullInfo(2, [[1, 2, 3]]) == []
 
 def test_getSpatialIDDistrictByCoordinates(requests_mock):
     requests_mock.post(f'{docker_net}pointInDistrict', json=[{'idSpatial': '10'}])

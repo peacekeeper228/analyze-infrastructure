@@ -4,18 +4,15 @@ import requests
 from utils import *
 import json
 from Buildings import *
-from typing import List
-from Municipality import Municipalities
 from models import *
 
 from formula import *
-from Districts import District
 from workingWithHexagones import *
-from typing import List
-from .changingStatistics import changeDistrictStatistic, transformInfoCounties, transformInfoDistricts
+import os, sys
+from changingStatistics import changeDistrictStatistic, transformInfoCounties, transformInfoDistricts
 
 app = Flask(__name__)
-
+sys.path.append(os.getcwd())
 @app.route('/main_page')
 def hello_world():
     return render_template('main_page.html', user="test")
