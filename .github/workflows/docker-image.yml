@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: "Build connector"
+      run: docker build --pull --rm -f "connector/Dockerfile" -t apiconnector:latest "connector"
+    - name: "Build flask"
+      run: docker build --pull --rm -f "flask/Dockerfile" -t flask:latest "flask"
+    - name: "docker up"
+      run: docker compose -f "docker-compose.dev.yml" up -d --build
+    - name: "Wait for docker to finish building"
+      run: sleep 30
+    - name: "Check they are alive"
+      run: docker ps -a
+    - name: "check databases by curl, not postman by now"
+      run: curl http://127.0.0.1:8008/mongocollections
