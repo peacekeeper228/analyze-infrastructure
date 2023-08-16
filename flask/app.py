@@ -5,6 +5,7 @@ from utils import *
 import json
 from Buildings import *
 from models import *
+
 from formula import *
 from workingWithHexagones import *
 import os, sys
@@ -115,7 +116,6 @@ def changes():
     return render_template('statistics.html',
                             models=models,
                             valuesdict=valuesdict)
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
