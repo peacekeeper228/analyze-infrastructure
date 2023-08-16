@@ -40,15 +40,15 @@ jobs:
         npm install -g newman-reporter-htmlextra
 
     - name: Make Directory for Test Results
-        run: mkdir -p testArtifacts
+      run: mkdir -p testArtifacts
  
  
       # Run postman collection
-      - name: Run Postman Collection        
-        run: |
-          newman  run tests/apiconnector
-      - name: Output the results
-        uses: actions/upload-artifact@v2
-        with:
-         name: Reports
-         path: testArtifacts
+    - name: Run Postman Collection        
+      run: |
+        newman  run tests/apiconnector
+    - name: Output the results
+      uses: actions/upload-artifact@v2
+      with:
+       name: Reports
+       path: testArtifacts
