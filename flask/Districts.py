@@ -1,5 +1,10 @@
 from typing import Dict, List, Set, Union, Tuple
-from .utils import isDisrictProvisionWithSchool, isDistrictProvisionWithKindergarten, calculateNewIndex
+
+if __package__:
+    from .utils import isDisrictProvisionWithSchool, isDistrictProvisionWithKindergarten, calculateNewIndex
+else:
+    from utils import isDisrictProvisionWithSchool, isDistrictProvisionWithKindergarten, calculateNewIndex
+    
 class District(object):
     def __init__(self, data : Dict[str, Union[str, int, float]]) -> None:
         self.data = data

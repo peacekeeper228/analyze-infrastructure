@@ -1,17 +1,22 @@
 import requests
-import json
 from typing import List
-from .Municipality import Municipalities
+import os, sys
+sys.path.append(os.getcwd())
+if __package__:
+    from .Municipality import Municipalities
+    from .utils import docker_net
+else:
+    from Municipality import Municipalities
+    from utils import docker_net
+    
 
-from .utils import docker_net
+
 def requestBuildingsFullInfo(database : int, arrayID : List[int]) -> List[dict]:
     try:
         jsonData = requests.post(docker_net + "buildingIDcounty", json={"database": database, "arrayID" : arrayID}).json()
-        if jsonData == []:
-            raise ValueError("У нас нет инфомации о данном объекте")
         return jsonData
-    except:
-        raise ValueError("У нас нет инфомации о данном объекте")
+    except ValueError:
+        raise ValueError("Во время запроса к серверу что-то пошло не так")
     
 
 def getSpatialIDDistrictByCoordinates(lon : float, lat : float) -> int:

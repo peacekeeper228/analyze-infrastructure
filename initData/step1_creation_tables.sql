@@ -12,7 +12,7 @@ CREATE TABLE medTypes
 
 CREATE TABLE zones
 (
-    name CHARACTER VARYING(20) PRIMARY KEY
+    name CHARACTER VARYING(20) PRIMARY KEY,
     schoolValue INTEGER,
     kindergartenValue INTEGER
 );

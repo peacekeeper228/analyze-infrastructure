@@ -1,6 +1,11 @@
-from .Districts import District
 from typing import List, Dict, Union
-from .formula import calculateD, calculateP
+
+if __package__:
+    from .Districts import District
+    from .formula import calculateD, calculateP
+else:
+    from Districts import District
+    from formula import calculateD, calculateP
 
 def changeDistrictStatistic(districts_json) -> List[District]:
     dist_list = []
