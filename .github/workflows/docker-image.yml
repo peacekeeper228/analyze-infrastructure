@@ -24,3 +24,5 @@ jobs:
       run: sleep 30
     - name: "Check they are alive"
       run: docker ps -a
+    - name: "check databases by curl, not postman by now"
+      run: curl http://127.0.0.1:8008/mongocollections
