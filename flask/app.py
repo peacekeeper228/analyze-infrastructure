@@ -10,6 +10,7 @@ from formula import *
 from workingWithHexagones import *
 import os, sys
 from changingStatistics import changeDistrictStatistic, transformInfoCounties, transformInfoDistricts
+
 app = Flask(__name__)
 sys.path.append(os.getcwd())
 @app.route('/main_page')

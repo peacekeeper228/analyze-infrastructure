@@ -7,6 +7,7 @@ else:
     from Districts import District
     from formula import calculateD, calculateP
 
+
 def changeDistrictStatistic(districts_json) -> List[District]:
     dist_list = []
     for i in range(len(districts_json)):
