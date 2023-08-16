@@ -15,9 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: "Build connector"
-      run: docker build --pull --rm -f "connector\Dockerfile" -t apiconnector:latest "connector"
+      run: docker build --pull --rm -f "connector/Dockerfile" -t apiconnector:latest "connector"
     - name: "Build flask"
-      run: docker build --pull --rm -f "flask\Dockerfile" -t flask:latest "flask"
+      run: docker build --pull --rm -f "flask/Dockerfile" -t flask:latest "flask"
     - name: "docker up"
       run: docker compose -f "docker-compose.dev.yml" up -d --build
     - name: "Wait for docker to finish building"
