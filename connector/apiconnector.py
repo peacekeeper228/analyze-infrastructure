@@ -56,7 +56,7 @@ async def districts(request: Request):
  	"arrayID": [1,2] 
 }
 '''
-
+#кажется, не нужно
 @app.get("/districtsname")
 async def districtsname():
     dataBaseLink = dbPostgresGetDistricts()
