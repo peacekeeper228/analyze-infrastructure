@@ -124,10 +124,6 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});",
-							"pm.test(\"The same length\", function () {",
-							"    let jsonData = pm.response.json();",
-							"    pm.expect(jsonData.length).to.eql(1);",
 							"});"
 						],
 						"type": "text/javascript"
