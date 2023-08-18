@@ -112,7 +112,7 @@
 							"});",
 							"pm.test(\"Other properties\", function () {",
 							"    let district = jsonData[0];",
-							"    pm.expect(district.namedistrict).to.eql(\"Федеральный медицинский центр\");",
+							"    pm.expect(district.namedistrict).to.eql(\"Красносельский район\");",
 							"    pm.expect(district.idspatial).to.eql(106);",
 							"});",
 							""
