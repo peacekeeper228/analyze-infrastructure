@@ -145,9 +145,9 @@ async def schoolsfull(request: Request):
     return JSONResponse(content=result, status_code=200)
 '''
 {
-    "IDsource": ["район Ивановское"],
-  	"isCounty": false,
-  	"database": 1
+    "database": 1,
+    "isCounty": false,
+    "IDsource": ["Красносельский район"]
 }
 '''
 @app.post("/districtsID")

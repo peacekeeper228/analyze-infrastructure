@@ -53,9 +53,10 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"The same length\", function () {",
+							"pm.test(\"The right values\", function () {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(jsonData[0]).to.eql(pm.variables.get(\"county\"));",
 							"});"
 						],
 						"type": "text/javascript"
@@ -162,11 +163,10 @@
 							"pm.test(\"Check length and values\", function () {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(Object.keys(jsonData).length).to.eql(1);",
-							"    let county = \"Центральный административный округ\";",
-							"    let district = \"Красносельский район\";",
+							"    let county = pm.variables.get(\"county\");",
 							"    pm.expect(Object.keys(jsonData)[0]).to.eql(county);",
 							"    pm.expect(jsonData[county].length).to.eql(1);",
-							"    pm.expect(jsonData[county][0]).to.eql(district);",
+							"    pm.expect(jsonData[county][0]).to.eql(pm.variables.get(\"district\"));",
 							"});"
 						],
 						"type": "text/javascript"
@@ -203,6 +203,11 @@
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData.length).to.eql(1);",
 							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"namedistrict\"]).to.eql(pm.variables.get(\"district\"));",
+							"    pm.expect(jsonData[0][\"namecounty\"]).to.eql(pm.variables.get(\"county\"));",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -217,7 +222,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"arrayID\":[106]}",
+					"raw": "{\r\n    \"arrayID\": [\r\n        106\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -265,7 +270,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"arrayID\":[106]}",
+					"raw": "{\r\n    \"database\": 1,\r\n    \"isCounty\": false,\r\n    \"IDsource\": [\"Красносельский район\"]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -308,7 +313,7 @@
 							"    pm.expect(medObj.storey).to.eql(0);",
 							"    pm.expect(medObj.idspatial).to.eql(618);",
 							"    pm.expect(medObj.medtype).to.eql(\"Больница\");",
-							"    pm.expect(medObj.iddistrict).to.eql(\"relation/1257218\");",
+							"    pm.expect(medObj.iddistrict).to.eql(pm.variables.get(\"iddistrict\"));",
 							"});"
 						],
 						"type": "text/javascript"
@@ -350,9 +355,20 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
+							"let jsonData = pm.response.json();",
+							"let medObj = jsonData[0];",
 							"pm.test(\"The same id\", function () {",
-							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData.length).to.eql(1);",
+							"});",
+							"pm.test(\"Other properties\", function () {",
+							"    pm.expect(medObj.fullname).to.eql(\"Федеральный медицинский центр\");",
+							"    pm.expect(medObj.website).to.eql(\"NaN\");",
+							"    pm.expect(medObj.adress).to.eql(\"Каланчёвская улица 31\");",
+							"    pm.expect(medObj.area).to.eql(902.0);",
+							"    pm.expect(medObj.storey).to.eql(0);",
+							"    pm.expect(medObj.idspatial).to.eql(618);",
+							"    pm.expect(medObj.medtype).to.eql(\"Больница\");",
+							"    pm.expect(medObj.iddistrict).to.eql(pm.variables.get(\"iddistrict\"));",
 							"});",
 							""
 						],
@@ -368,7 +384,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"arrayID\":[106]}",
+					"raw": "{\r\n    \"database\": 1,\r\n    \"arrayID\": [\r\n        1\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -398,9 +414,14 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							"pm.test(\"The same id\", function () {",
+							"pm.test(\"The same length\", function () {",
 							"    let jsonData = pm.response.json();",
 							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(20);",
+							"});",
+							"pm.test(\"The right values\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"namedistrict\"]).to.eql(pm.variables.get(\"district\"));",
 							"});",
 							""
 						],
@@ -416,7 +437,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"arrayID\":[106]}",
+					"raw": "{\"IDsource\":[\"relation/1257218\"]}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -446,7 +467,16 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(21);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"namedistrict\"]).to.eql(pm.variables.get(\"district\"));",
+							"    pm.expect(jsonData[0][\"iddistrict\"]).to.eql(pm.variables.get(\"iddistrict\"));",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -457,7 +487,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n\t\"IDsource\": [\"Красносельский район\"]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -487,7 +517,16 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(13);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"namecounty\"]).to.eql(pm.variables.get(\"county\"));",
+							"    pm.expect(jsonData[0][\"idcount\"]).to.eql(pm.variables.get(\"idcounty\"));",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -498,7 +537,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"countynames\": [\n        \"Центральный административный округ\"\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -528,6 +567,15 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(12);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"namecounty\"]).to.eql(pm.variables.get(\"county\"));",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -539,7 +587,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n\t\"districtID\": \"relation/1257218\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -569,6 +617,15 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(12);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"namecounty\"]).to.eql(pm.variables.get(\"county\"));",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -580,7 +637,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"districtName\": \"Красносельский район\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -625,6 +682,26 @@
 		{
 			"key": "base_url",
 			"value": "http://127.0.0.1:8008"
+		},
+		{
+			"key": "county",
+			"value": "Центральный административный округ",
+			"type": "string"
+		},
+		{
+			"key": "district",
+			"value": "Красносельский район",
+			"type": "string"
+		},
+		{
+			"key": "iddistrict",
+			"value": "relation/1257218",
+			"type": "string"
+		},
+		{
+			"key": "idcounty",
+			"value": "relation/2162196",
+			"type": "string"
 		}
 	]
 }

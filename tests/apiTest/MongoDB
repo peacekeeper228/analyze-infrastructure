@@ -48,7 +48,11 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The right length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(4);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -59,7 +63,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"database\": 0,\n    \"listID\": [\n        1\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -89,7 +93,11 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(2);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(4);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -100,7 +108,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"Slat\": 50,\n    \"Nlat\": 60,\n    \"Wlon\": 30,\n    \"Elon\": 40,\n    \"database\": 0\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -130,6 +138,15 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(2);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"idSpatial\"]).to.eql(106);",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -141,7 +158,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"lon\": 37.5,\n    \"lat\": 55.75\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -171,7 +188,15 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(4);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"idSpatial\"]).to.eql(618);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -182,7 +207,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"lon\": 37.573792,\n    \"lat\": 55.781207,\n \t\"distance\": 100,\n    \"database\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -212,7 +237,17 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(4);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"idSpatial\"]).to.eql(618);",
+							"    pm.expect(jsonData[0][\"latitude\"]).to.eql(55.781207);",
+							"    pm.expect(jsonData[0][\"longitude\"]).to.eql(37.573792);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -223,7 +258,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"lon\": 37.573792,\n    \"lat\": 55.781207,\n \t\"distance\": 100,\n    \"database\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -253,7 +288,15 @@
 							"pm.test(\"Successful POST request\", function () {",
 							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 							"});",
-							""
+							"pm.test(\"The same length\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(13);",
+							"});",
+							"pm.test(\"The right values\", function() {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData[0][\"idSpatial\"]).to.eql(618);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -264,7 +307,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+					"raw": "{\n    \"lon\": 37.573792,\n    \"lat\": 55.781207,\n \t\"distance\": 100,\n    \"database\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"

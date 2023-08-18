@@ -150,7 +150,7 @@ db.eduBuildings.createIndex({ 'geometry': '2dsphere' });
 db.eduBuildings.createIndex({ 'idSpatial': 1 });
 db.eduBuildings.insertMany([
     {
-        "idSpatial": 1, "latitude": 55.70359857748261, "longitude": 37.938057458250945, "geometry": {
+        "idSpatial": 1, "latitude": 55.814555, "longitude": 37.547424, "geometry": {
             "type": "Polygon",
             "coordinates": [
                 [

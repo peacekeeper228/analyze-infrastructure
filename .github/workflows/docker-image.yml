@@ -46,7 +46,7 @@ jobs:
       # Run postman collection
     - name: Run Postman Collection        
       run: |
-        newman  run tests/apiconnector -r htmlextra --reporter-htmlextra-export testArtifacts/htmlreport.html
+        newman  run --folder tests/apiTest -r htmlextra --reporter-htmlextra-export testArtifacts/htmlreport.html
     - name: Output the results
       uses: actions/upload-artifact@v2
       with:
