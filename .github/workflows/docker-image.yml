@@ -43,10 +43,16 @@ jobs:
       run: mkdir -p testArtifacts
  
  
-      # Run postman collection
-    - name: Run Postman Collection        
+      # Run postman collection, ok I don't know how
+    - name: Run Postman Collection 1        
       run: |
-        newman  run tests/apiconnector -r htmlextra --reporter-htmlextra-export testArtifacts/htmlreport.html
+        newman  run tests/apiTest/MongoDB -r htmlextra --reporter-htmlextra-export testArtifacts/htmlreportMongo.html
+    - name: Run Postman Collection 2       
+      run: |
+        newman  run tests/apiTest/PostgreSQL -r htmlextra --reporter-htmlextra-export testArtifacts/htmlreportPostgre.html
+    - name: Run Postman Collection 3       
+      run: |
+        newman  run tests/apiTest/BothDatabases -r htmlextra --reporter-htmlextra-export testArtifacts/htmlreportBoth.html
     - name: Output the results
       uses: actions/upload-artifact@v2
       with:

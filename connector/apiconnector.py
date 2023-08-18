@@ -56,7 +56,7 @@ async def districts(request: Request):
  	"arrayID": [1,2] 
 }
 '''
-
+#кажется, не нужно
 @app.get("/districtsname")
 async def districtsname():
     dataBaseLink = dbPostgresGetDistricts()
@@ -145,9 +145,9 @@ async def schoolsfull(request: Request):
     return JSONResponse(content=result, status_code=200)
 '''
 {
-    "IDsource": ["район Ивановское"],
-  	"isCounty": false,
-  	"database": 1
+    "database": 1,
+    "isCounty": false,
+    "IDsource": ["Красносельский район"]
 }
 '''
 @app.post("/districtsID")

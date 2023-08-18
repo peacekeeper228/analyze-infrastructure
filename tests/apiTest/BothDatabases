@@ -1,0 +1,185 @@
+{
+	"info": {
+		"_postman_id": "2fb1fb49-d580-4fd3-9dab-0029a5e7d419",
+		"name": "BothDatabases",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29129797"
+	},
+	"item": [
+		{
+			"name": "buildingfullinfo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"pm.test(\"The same id\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"    pm.expect(Object.keys(jsonData[0]).length).to.eql(20);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"database\": 0,\r\n    \"isCounty\": false,\r\n    \"IDsource\": [\r\n        \"Красносельский район\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/buildingfullinfo",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"buildingfullinfo"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "changesforschool",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"1\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/changesforschool",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"changesforschool"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "districtsfullinfo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							"let jsonData = pm.response.json();",
+							"pm.test(\"The same id\", function () {",
+							"    pm.expect(jsonData.length).to.eql(1);",
+							"});",
+							"pm.test(\"Other properties\", function () {",
+							"    let district = jsonData[0];",
+							"    pm.expect(district.namedistrict).to.eql(\"Красносельский район\");",
+							"    pm.expect(district.idspatial).to.eql(106);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"IDsource\": [\r\n        \"Красносельский район\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/districtsfullinfo",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"districtsfullinfo"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8008",
+			"type": "string"
+		},
+		{
+			"key": "county",
+			"value": "Центральный административный округ\n",
+			"type": "string"
+		}
+	]
+}
