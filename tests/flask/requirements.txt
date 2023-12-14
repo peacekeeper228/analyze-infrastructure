@@ -1,0 +1,5 @@
+flake8
+pytest
+requests
+requests-mock
+h3==3.7.6
