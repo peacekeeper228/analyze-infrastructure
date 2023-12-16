@@ -56,3 +56,9 @@ def changeWorkloadInDistrict(numberOfSchoolsInDistrict : int, averageSchoolLoadI
 
 def calculateWorkloadInSchool(numberOfStudents : int, schoolCapacity : int):
     return (numberOfStudents / schoolCapacity) * 100
+
+def municipalityID(isCounty : bool, data : dict):
+    if isCounty:
+        return data['idcount']
+    else:
+        return data['iddistrict']

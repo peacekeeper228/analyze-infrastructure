@@ -6,6 +6,7 @@ import json
 from Buildings import *
 from models import *
 
+from Municipality import municipalityID
 from formula import *
 from workingWithHexagones import *
 import os, sys
@@ -15,7 +16,7 @@ app = Flask(__name__)
 sys.path.append(os.getcwd())
 @app.route('/main_page')
 def hello_world():
-    return render_template('main_page.html', user="test")
+    return render_template('main_page.html')
 
 @app.route('/')
 def basic_page():
@@ -27,22 +28,20 @@ def about():
 
 @app.route('/map')
 def map_page():
-    r = requests.get("http://connector:8000/districtcountyname")
-    datadistricts = json.loads(r.text)
-    return render_template('map.html', datadistricts=datadistricts)
+    return render_template('map.html', datadistricts=mapInfo())
 
 @app.route('/buildingfullinfo', methods=['POST'])
 def buildingfullinfo():
     input_json = request.get_json(force=True)
     database = input_json['database']   
-    r = requests.post("http://connector:8000/buildingfullinfo", json=input_json)
+    r = requests.post(f'{docker_net}buildingfullinfo', json=input_json)
     datadistricts = json.loads(r.text)
     return makeGeojson(datadistricts, throwListForDatabases[database])
 
 @app.route('/districtsfullinfo', methods=['POST'])
 def districtsfullinfo():
     input_json = request.get_json(force=True)
-    r = requests.post("http://connector:8000/districtsfullinfo", json=input_json)
+    r = requests.post(f'{docker_net}districtsfullinfo', json=input_json)
     datadistricts = json.loads(r.text)
     return makeGeojson(data=datadistricts)
 
@@ -53,16 +52,16 @@ def nearcoordinates():
     distance = Ravailability(districtID, input_json['database'])
     input_json["distance"] = distance
     input_json["database"] = 2
-    r = requests.post("http://connector:8000/nearcoordinatesfullinfo", json=input_json)
+    r = requests.post(f'{docker_net}nearcoordinatesfullinfo', json=input_json)
     if r.text == '[]':
-        return '[]' 
+        return r.text
     datadistricts = json.loads(r.text)
     return {"data":makeGeojson(data=datadistricts), "radius": distance}
 
 @app.route('/hexForDistricts', methods=['POST'])
 def hexForDistricts():
     input_json = request.get_json(force=True)
-    r = requests.post("http://connector:8000/districtsfullinfo", json=input_json)
+    r = requests.post(f'{docker_net}districtsfullinfo', json=input_json)
     datadistricts = json.loads(r.text)
     geojson = makeGeojson(data=datadistricts)
     return assembleHexagones(geojson, hexagone_size=input_json['hexagone_size'])
@@ -77,7 +76,7 @@ def hexForDistricts():
 @app.route('/checkforschool', methods=['POST'])
 def checkforschool():
     input_json = request.get_json(force=True)
-    r = requests.post("http://connector:8000/changesforschool", json=input_json)
+    r = requests.post(f'{docker_net}changesforschool', json=input_json)
     dataAboutSchools = json.loads(r.text)
     return dataAboutSchools
     
@@ -90,9 +89,10 @@ def changes():
         Buildings.insertDataAccordingToType(i)
 
     for i in range(len(Buildings.buildingCollection)):
-        Buildings.buildingCollection[i].setObjects(requestBuildingsFullInfo(
-            Buildings.buildingCollection[i].getDatabaseNumber(),
-            Buildings.buildingCollection[i].getIDList()))
+        Buildings.buildingCollection[i].setObjects(
+            requestBuildingsFullInfo(
+                Buildings.buildingCollection[i].getDatabaseNumber(),
+                Buildings.buildingCollection[i].getIDList()))
     if input_json_all['isCounty']:
         municipalities = infoAboutSelectedCounties(input_json_all['counties'])    
     else:
@@ -100,14 +100,11 @@ def changes():
     
     for objectCollection in Buildings.buildingCollection:
         for i in objectCollection.getObjects():
-            if input_json_all['isCounty']:
-                municipalityID = i['idcount']
-            else:
-                municipalityID = i['iddistrict']
-            if not municipalities.checkInMunicipalities(municipalityID):
-                continue
-            buildChanges = objectCollection.getDataByID(i['buildid'])
-            municipalities.insertChanges(municipalityID, buildChanges, i)
+            munID = municipalityID(input_json_all['isCounty'], i)
+            if municipalities.checkInMunicipalities(munID):
+                buildChanges = objectCollection.getDataByID(i['buildid'])
+                municipalities.insertChanges(munID, buildChanges, i)
+
     if input_json_all['isCounty']:
         models=transformInfoCounties(municipalities.getMunicipalities())   
     else:

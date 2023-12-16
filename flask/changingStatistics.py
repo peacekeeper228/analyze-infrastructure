@@ -9,7 +9,7 @@ else:
 
 
 def changeDistrictStatistic(districts_json) -> List[District]:
-    dist_list = []
+    listDistricts = []
     for i in range(len(districts_json)):
         dataDistrict = District(districts_json[i])
         
@@ -18,23 +18,23 @@ def changeDistrictStatistic(districts_json) -> List[District]:
             dataDistrict.residents,
             dataDistrict.schoolIndex
         )
-        old_D = calculus.calculate()
+        oldD = calculus.calculate()
 
         dataDistrict.updateValues()
         
         calculus = calculateP(
             dataDistrict.residents,
             dataDistrict.schoolIndex,
-            old_D + dataDistrict.schoolTotalStudentsDelta - dataDistrict.schoolTotalCapacityDelta
+            oldD + dataDistrict.schoolTotalStudentsDelta - dataDistrict.schoolTotalCapacityDelta
         )
-        new_P = calculus.calculate()
-        dataDistrict.setProvisionIndicator(new_P)
-        dist_list.append(dataDistrict)
-    return dist_list
+        newP = calculus.calculate()
+        dataDistrict.setProvisionIndicator(newP)
+        listDistricts.append(dataDistrict)
+    return listDistricts
 
-def transformInfoDistricts(dist_list : List[District] = []) -> List[Dict[str, Union[str, int, float]]]:
+def transformInfoDistricts(districts : List[District] = []) -> List[Dict[str, Union[str, int, float]]]:
     models = {}
-    for i in dist_list:
+    for i in districts:
         territories = i.namedistrict
         models[territories] = {'Площадь (м2)': round(i.area, 0),
             'Количество школ': i.schoolnumber,
@@ -56,9 +56,9 @@ def transformInfoDistricts(dist_list : List[District] = []) -> List[Dict[str, Un
             'Плотность жилой застройки': round(i.density, 4)}
     return models
 
-def transformInfoCounties(county_list):
+def transformInfoCounties(counties):
     models = {}
-    for i in county_list:
+    for i in counties:
         territories = i['namecounty']
         models[territories] = {'Площадь (м2)': round(i['area'], 0),
             'Количество школ': round(i['schoolnumber'], 0),

@@ -3,7 +3,7 @@ import os
 import pytest
 
 sys.path.append( os.path.join( os.path.dirname(__file__), "..." ))
-from flask.Municipality import Municipalities
+from flask.Municipality import Municipalities, municipalityID
 
 municipality1 = {'iddistrict': '10', 'schoolnumber': 2, 'schoolload': 50}
 municipality2 = {'iddistrict': '11', 'schoolnumber': 4}
@@ -73,3 +73,13 @@ def test_insertChangesSchools():
     municipalities.insertChanges(firstDistrictID, dictChanges, dictData)
     assert municipalities.getMunicipality(firstDistrictID)['schoolTotalCapacityDelta'] == changedValue2 + changedValue2
     assert municipalities.getMunicipality(firstDistrictID)['schoolTotalStudentsDelta'] == changedValue + changedValue
+
+def test_municipalityID():
+    data = {'idcount' : 'idcounty'}
+    data2 = {'iddistrict' : 'iddistrict'}
+    assert municipalityID(True, data) == 'idcounty'
+    assert municipalityID(False, data2) == 'iddistrict'
+    with pytest.raises(KeyError):
+        assert municipalityID(False, data) == 'idcounty'
+    with pytest.raises(KeyError):
+        assert municipalityID(True, data2) == 'iddistrict'
