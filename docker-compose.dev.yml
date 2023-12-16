@@ -12,7 +12,7 @@ services:
             - ./initData/step2_filling_lookup_tables.sql:/docker-entrypoint-initdb.d/step2_filling_lookup_tables.sql
             - ./tests/data/step3_filling_test_data.sql:/docker-entrypoint-initdb.d/step3_filling_test_data.sql
         ports:
-            - 27017:27017
+            - 5432:5432
             
 
     mongodb:
