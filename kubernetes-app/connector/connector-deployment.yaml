@@ -51,7 +51,6 @@ spec:
           name: connector
           ports:
             - containerPort: 8000
-              hostPort: 8000
               protocol: TCP
           resources:
             limits:
