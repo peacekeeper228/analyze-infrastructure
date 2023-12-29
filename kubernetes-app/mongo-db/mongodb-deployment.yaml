@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    io.kompose.service: mongodb
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mongodb
+  serviceName: "mongodb"
+  template:
+    metadata:
+      labels:
+        io.kompose.network/dockertest-default: "true"
+        io.kompose.service: mongodb
+    spec:
+      containers:
+        - env:
+            - name: MONGODB_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_PASSWORD
+            - name: MONGODB_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_LOGIN
+          image: peacekeeper228/socialmongo:1.0 
+          imagePullPolicy: Always
+          name: mongodb
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          resources: 
+            limits:
+              memory: "2048Mi"
+              cpu: "500m"
+      restartPolicy: Always
+      

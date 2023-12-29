@@ -11,6 +11,8 @@ services:
             - ./initData/step1_creation_tables.sql:/docker-entrypoint-initdb.d/step1_creation_tables.sql
             - ./initData/step2_filling_lookup_tables.sql:/docker-entrypoint-initdb.d/step2_filling_lookup_tables.sql
             - ./tests/data/step3_filling_test_data.sql:/docker-entrypoint-initdb.d/step3_filling_test_data.sql
+        ports:
+            - 5432:5432
             
 
     mongodb:
@@ -26,7 +28,7 @@ services:
            - ./tests/data/mongo.js:/docker-entrypoint-initdb.d/mongo.js:ro
 
     connector:
-        image: apiconnector:latest
+        image: peacekeeper228/apiconnector:latest
         restart: always
         environment:
             MONGO_LOGIN: ${MONGO_LOGIN}
@@ -41,7 +43,7 @@ services:
             - postgres
             - mongodb
     flask:
-        image: flask:latest
+        image: peacekeeper228/flask:latest
         ports:
             - 80:5000
         command: python app.py
